@@ -142,13 +142,24 @@ namespace SolrNet.Impl {
                     Cache.Add(new SolrCacheEntity(u.Uri.ToString(), response.ETag, response.Data));
                 return response.Data;
             } catch (WebException e) {
-                if (e.Response != null) {
-                    var r = new HttpWebResponseAdapter(e.Response);
+                var webResponse = e.Response;
+                if (webResponse != null) {
+                    var r = new HttpWebResponseAdapter(webResponse);
+
+                    var responseBody = string.Empty;
+
+                    var responseStream = webResponse.GetResponseStream();
+                    if (responseStream != null) {
+                        var streamReader = new StreamReader(responseStream);
+                        responseBody = streamReader.ReadToEnd();
+                    }
+
                     if (r.StatusCode == HttpStatusCode.NotModified) {
                         return cached.Data;
                     }
+
                     if (r.StatusCode == HttpStatusCode.BadRequest) {
-                        throw new InvalidFieldException(r.StatusDescription, e);
+                        throw new InvalidFieldException(r.StatusDescription, responseBody, e);
                     }
                 }
                 throw new SolrConnectionException(e);
