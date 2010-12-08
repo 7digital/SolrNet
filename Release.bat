@@ -1,1 +1,1 @@
-C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\msbuild solrnet.proj /m /t:ReleasePackage
+lib\fake.exe build.fsx target=BuildAndRelease config=Release
