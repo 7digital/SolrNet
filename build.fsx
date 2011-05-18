@@ -112,8 +112,8 @@ Target "Version" (fun _ ->
                                     AssemblyInformationalVersion = Git.sha1()
                                     AssemblyCopyright = "Copyright Mauricio Scheffer 2007-" + DateTime.Now.Year.ToString()
                                     Guid = "6688f9b4-5f2d-4fd6-aafc-3a81c84a69f1"
-                                    AssemblyVersion = version
-                                    AssemblyFileVersion = version })
+                                    AssemblyVersion = nuGetBuild
+                                    AssemblyFileVersion = nuGetBuild })
 )
 
 Target "Docs" (fun _ ->
