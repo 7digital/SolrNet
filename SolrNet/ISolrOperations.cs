@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using SolrNet.Exceptions;
 using SolrNet.Mapping.Validation;
 
@@ -33,6 +34,12 @@ namespace SolrNet {
         ResponseHeader Commit();
 
         /// <summary>
+        /// Rollbacks all add/deletes made to the index since the last commit.
+        /// </summary>
+        /// <returns></returns>
+        ResponseHeader Rollback();
+
+        /// <summary>
         /// Optimizes Solr's index
         /// </summary>
         ResponseHeader Optimize();
@@ -45,6 +52,14 @@ namespace SolrNet {
         ResponseHeader Add(T doc);
 
         /// <summary>
+        /// Adds / updates a document with parameters
+        /// </summary>
+        /// <param name="doc">The document to add/update.</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        ResponseHeader Add(T doc, AddParameters parameters);
+
+        /// <summary>
         /// Adds / updates a document with index-time boost
         /// </summary>
         /// <param name="doc"></param>
@@ -53,18 +68,85 @@ namespace SolrNet {
         ResponseHeader AddWithBoost(T doc, double boost);
 
         /// <summary>
+        /// Adds / updates a document with index-time boost and add parameters
+        /// </summary>
+        /// <param name="doc">The document to add/update.</param>
+        /// <param name="boost">The index-time boost to apply.</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        ResponseHeader AddWithBoost(T doc, double boost, AddParameters parameters);
+
+        /// <summary>
+        /// Adds / updates the extracted content of a richdocument
+        /// </summary>
+        /// <param name="parameters">The extracttion parameters</param>
+        /// <returns></returns>
+        ExtractResponse Extract(ExtractParameters parameters);
+
+        /// <summary>
         /// Adds / updates several documents at once
         /// </summary>
         /// <param name="docs">documents to add/update</param>
         /// <returns></returns>
+        [Obsolete("Use AddRange instead")]
         ResponseHeader Add(IEnumerable<T> docs);
+
+
+        /// <summary>
+        /// Adds / updates several documents at once
+        /// </summary>
+        /// <param name="docs">documents to add/update</param>
+        /// <returns></returns>
+        ResponseHeader AddRange(IEnumerable<T> docs);
+
+        /// <summary>
+        /// Adds / updates several documents at once
+        /// </summary>
+        /// <param name="docs">documents to add/update</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        [Obsolete("Use AddRange instead")]
+        ResponseHeader Add(IEnumerable<T> docs, AddParameters parameters);
+
+        /// <summary>
+        /// Adds / updates several documents at once
+        /// </summary>
+        /// <param name="docs">documents to add/update</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        ResponseHeader AddRange(IEnumerable<T> docs, AddParameters parameters);
 
         /// <summary>
         /// Adds / updates documents with index-time boost
         /// </summary>
         /// <param name="docs">List of docs / boost. If boost is null, no boost is applied</param>
         /// <returns></returns>
+        [Obsolete("Use AddRangeWithBoost instead")]
         ResponseHeader AddWithBoost(IEnumerable<KeyValuePair<T, double?>> docs);
+
+        /// <summary>
+        /// Adds / updates documents with index-time boost
+        /// </summary>
+        /// <param name="docs">List of docs / boost. If boost is null, no boost is applied</param>
+        /// <returns></returns>
+        ResponseHeader AddRangeWithBoost(IEnumerable<KeyValuePair<T, double?>> docs);
+
+        /// <summary>
+        /// Adds / updates documents with index-time boost and add parameters
+        /// </summary>
+        /// <param name="docs">List of docs / boost. If boost is null, no boost is applied</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        [Obsolete("Use AddRangeWithBoost instead")]
+        ResponseHeader AddWithBoost(IEnumerable<KeyValuePair<T, double?>> docs, AddParameters parameters);
+
+        /// <summary>
+        /// Adds / updates documents with index-time boost and add parameters
+        /// </summary>
+        /// <param name="docs">List of docs / boost. If boost is null, no boost is applied</param>
+        /// <param name="parameters">The add parameters.</param>
+        /// <returns></returns>
+        ResponseHeader AddRangeWithBoost(IEnumerable<KeyValuePair<T, double?>> docs, AddParameters parameters);
 
         /// <summary>
         /// Deletes a document (requires the document to have a unique key defined with non-null value)

@@ -15,13 +15,13 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Practices.ServiceLocation;
 using Rhino.Commons;
 using SolrNet.Commands;
 using SolrNet.Commands.Parameters;
 using SolrNet.DSL.Impl;
 using SolrNet.Impl;
-using SolrNet.Utils;
 
 namespace SolrNet.DSL {
     /// <summary>
@@ -49,8 +49,18 @@ namespace SolrNet.DSL {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="document"></param>
-        public static void Add<T>(T document) {
-            Add<T>(new[] {document});
+        public static void Add<T>( T document ) {
+            Add<T>( new[] { document } );
+        }
+
+        /// <summary>
+        /// Adds/updates a document with an optional Boost Value to the entire document.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="document">The document.</param>
+        /// <param name="boostValue">The boost value to apply to the document.</param>
+        public static void Add<T>( T document, double? boostValue ) {
+            Add<T>( new[] { document }, boostValue );
         }
 
         /// <summary>
@@ -58,10 +68,42 @@ namespace SolrNet.DSL {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="documents"></param>
-        public static void Add<T>(IEnumerable<T> documents) {
-            var docs = Func.Select(documents, d => new KeyValuePair<T, double?>(d, null));
-            var cmd = new AddCommand<T>(docs, ServiceLocator.Current.GetInstance<ISolrDocumentSerializer<T>>());
-            cmd.Execute(Connection);
+        public static void Add<T>( IEnumerable<T> documents ) {
+            var docs = documents.Select( d => new KeyValuePair<T, double?>( d, null ) );
+            var cmd = new AddCommand<T>( docs, ServiceLocator.Current.GetInstance<ISolrDocumentSerializer<T>>(), null );
+            cmd.Execute( Connection );
+        }
+
+        /// <summary>
+        /// Adds/updates a list of documents with an optional Boost Value to all documents specified.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="documents">The documents.</param>
+        /// <param name="boostValue">The boost value to apply to all documents.</param>
+        public static void Add<T>( IEnumerable<T> documents, double? boostValue ) {
+            var docs = documents.Select( d => new KeyValuePair<T, double?>( d, boostValue ) );
+            var cmd = new AddCommand<T>( docs, ServiceLocator.Current.GetInstance<ISolrDocumentSerializer<T>>(), null );
+            cmd.Execute( Connection );
+        }
+
+        /// <summary>
+        /// Connects to the specified Solr server URL.
+        /// </summary>
+        /// <param name="serverURL">The server URL.</param>
+        public static void Connect( string serverURL ) {
+            Connection = new SolrConnection( serverURL );
+        }
+
+        /// <summary>
+        /// Connects to the specified Solr server URL.
+        /// </summary>
+        /// <param name="serverURL">The server URL.</param>
+        /// <param name="timeout">The HTTP connection timeout.</param>
+        public static void Connect( string serverURL, int timeout ) {
+            Connection = new SolrConnection( serverURL ) {
+                Timeout = timeout
+            };
+
         }
 
         private static ISolrQueryExecuter<T> NewQueryExecuter<T>() {
@@ -192,9 +234,21 @@ namespace SolrNet.DSL {
         /// <param name="query">Query</param>
         /// <param name="orders">Sort orders</param>
         /// <returns>Query results</returns>
-        public static ISolrQueryResults<T> Query<T>(SolrQuery query, ICollection<SortOrder> orders) {
-            var queryExecuter = NewQueryExecuter<T>(); 
-            return queryExecuter.Execute(query, new QueryOptions { OrderBy = orders });
+        public static ISolrQueryResults<T> Query<T>( SolrQuery query, ICollection<SortOrder> orders ) {
+            var queryExecuter = NewQueryExecuter<T>();
+            return queryExecuter.Execute( query, new QueryOptions { OrderBy = orders } );
+        }
+
+        /// <summary>
+        /// Executes a query
+        /// </summary>
+        /// <typeparam name="T">Document type</typeparam>
+        /// <param name="query">Query</param>
+        /// <param name="options">The QueryOptions to use.</param>
+        /// <returns>Query results</returns>
+        public static ISolrQueryResults<T> Query<T>( SolrQuery query, QueryOptions options ) {
+            var queryExecuter = NewQueryExecuter<T>();
+            return queryExecuter.Execute( query, options );
         }
 
         public static IDSLQuery<T> Query<T>() {

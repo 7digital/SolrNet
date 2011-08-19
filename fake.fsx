@@ -1,6 +1,7 @@
 ﻿#I @"lib"
 #r "FakeLib.dll"
-#r "NuGet.Core.dll"
+#r "NuGet.exe"
+#r "NuGet.Core.XmlSerializers.-872272761.dll"
 #r "System.Xml.Linq"
 
 open System
@@ -64,8 +65,9 @@ module Solr =
             if watch.Elapsed > (TimeSpan.FromSeconds 10.)
                 then failwith "Solr test instance didn't work"
             System.Threading.Thread.Sleep 500
-    let stop() =
-        Shell.Exec("java", cmdline + " --stop", dir = solr) |> ignore
+        { new IDisposable with
+            member x.Dispose() =
+                Shell.Exec("java", cmdline + " --stop", dir = solr) |> ignore }
 
 module Git =
     let sha1() = 

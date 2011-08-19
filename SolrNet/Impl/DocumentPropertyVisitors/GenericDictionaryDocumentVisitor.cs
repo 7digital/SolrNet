@@ -17,8 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
+using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 using SolrNet.Utils;
 
 namespace SolrNet.Impl.DocumentPropertyVisitors {
@@ -29,7 +30,7 @@ namespace SolrNet.Impl.DocumentPropertyVisitors {
         private readonly IReadOnlyMappingManager mapper;
         private readonly ISolrFieldParser parser;
         private readonly Converter<Type, bool> memoCanHandleType;
-        private readonly Func.Func2<Type, string, SolrFieldModel> memoGetThisField;
+        private readonly Func<Type, string, SolrFieldModel> memoGetThisField;
 
         /// <summary>
         /// Document visitor that handles generic dictionary properties
@@ -78,10 +79,10 @@ namespace SolrNet.Impl.DocumentPropertyVisitors {
         }
 
         public SolrFieldModel GetThisField(Type t, string fieldName) {
-            var allFields = mapper.GetFields(t);
-            var fieldsICanHandle = Func.Filter(allFields, f => memoCanHandleType(f.Property.PropertyType));
-            var matchingFields = Func.Filter(fieldsICanHandle, f => f.FieldName == "*" || fieldName.StartsWith(f.FieldName));
-            return Func.FirstOrDefault(matchingFields, f => !Func.Any(allFields, x => x.FieldName == fieldName && !Equals(x, f)));
+            var allFields = mapper.GetFields(t).Values;
+            var fieldsICanHandle = allFields.Where(f => memoCanHandleType(f.Property.PropertyType));
+            var matchingFields = fieldsICanHandle.Where(f => f.FieldName == "*" || fieldName.StartsWith(f.FieldName));
+            return matchingFields.FirstOrDefault(f => !allFields.Any(x => x.FieldName == fieldName && !Equals(x, f)));
         }
 
         public string GetKeyToUse(string k, string fieldName) {
@@ -90,7 +91,7 @@ namespace SolrNet.Impl.DocumentPropertyVisitors {
             return k.Substring(fieldName.Length);
         }
 
-        public void Visit(object doc, string fieldName, XmlNode field) {
+        public void Visit(object doc, string fieldName, XElement field) {
             var thisField = memoGetThisField(doc.GetType(), fieldName);
             if (thisField == null)
                 return;
@@ -101,7 +102,7 @@ namespace SolrNet.Impl.DocumentPropertyVisitors {
             var keyType = typeArgs[0];
             var valueType = typeArgs[1];
             var dict = thisField.Property.GetValue(doc, null) ?? NewDictionary(typeArgs);
-            var key = GetKeyToUse(field.Attributes["name"].InnerText, thisFieldName);
+            var key = GetKeyToUse(field.Attribute("name").Value, thisFieldName);
             var value = parser.Parse(field, valueType);
             SetKV(dict, ConvertTo(key, keyType), value);
             thisField.Property.SetValue(doc, dict, null);

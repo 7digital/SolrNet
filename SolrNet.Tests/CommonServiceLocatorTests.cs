@@ -24,7 +24,7 @@ using SolrNet.Utils;
 
 namespace SolrNet.Tests {
     [TestFixture]
-    public class CommonServiceLocatorTests {
+    public class CommonServiceLocatorTests : ServiceLocatorTestCase {
         [Test]
         public void Transient() {
             var container = new Container();
@@ -191,7 +191,7 @@ namespace SolrNet.Tests {
         public void InjectionWithoutDependency_throws() {
             var container = new Container();
             container.Register(c => new AnotherService(c.GetInstance<IService>()));
-            var svc = container.GetInstance<AnotherService>();
+            container.GetInstance<AnotherService>();
         }
 
         [Test]
@@ -288,8 +288,15 @@ namespace SolrNet.Tests {
             Assert.AreEqual(0, container.GetAllInstances<IService>().ToArray().Length);
         }
 
+        protected override IServiceLocator CreateServiceLocator() {
+            var container = new Container();
+            container.Register<ILogger>(typeof(SimpleLogger).FullName, c => new SimpleLogger());
+            container.Register<ILogger>(typeof(AdvancedLogger).FullName, c => new AdvancedLogger());
+            return container;
+        }
+
         [Test]
-        public void GetAllInstances() {
+        public void GetAllInstances2() {
             var container = new Container();
             var inst = new ServiceImpl();
             container.Register<IService>("inst1", c => inst);

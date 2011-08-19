@@ -57,9 +57,11 @@ namespace Ninject.Integration.SolrNet {
                 typeof(SpellCheckResponseParser<>),
                 typeof(StatsResponseParser<>),
                 typeof(CollapseResponseParser<>),
+                typeof(GroupingResponseParser<>)
             })
                 Bind(typeof(ISolrResponseParser<>)).To(p);
             Bind<ISolrHeaderResponseParser>().To<HeaderResponseParser<string>>();
+            Bind<ISolrExtractResponseParser>().To<ExtractResponseParser>();
             foreach (var p in new[] {
                 typeof(MappedPropertiesIsInSolrSchemaRule),
                 typeof(RequiredFieldsAreMappedRule),
@@ -75,6 +77,7 @@ namespace Ninject.Integration.SolrNet {
             Bind(typeof(ISolrOperations<>)).To(typeof(SolrServer<>));
             Bind(typeof(ISolrReadOnlyOperations<>)).To(typeof(SolrServer<>));
             Bind<ISolrSchemaParser>().To<SolrSchemaParser>();
+            Bind<ISolrDIHStatusParser>().To<SolrDIHStatusParser>();
             Bind<IMappingValidator>().To<MappingValidator>();
         }
     }

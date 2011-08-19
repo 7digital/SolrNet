@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using MbUnit.Framework;
 using Microsoft.Practices.ServiceLocation;
@@ -48,9 +49,12 @@ namespace SolrNet.Tests.Integration.Sample {
 
         [Test]
         public void Add_then_query() {
+            const string name = "Samsuñg SpinPoint P120 SP2514N - hárd drívè - 250 GB - ÁTÀ-133";
+            var guid = new Guid("{78D734ED-12F8-44E0-8AA3-8CA3F353998D}");
             var p = new Product {
                 Id = "SP2514N",
-                Name = "Samsuñg SpinPoint P120 SP2514N - hárd drívè - 250 GB - ÁTÀ-133",
+                Guid = guid,
+                Name = name,
                 // testing UTF
                 Manufacturer = "Samsung Electronics Co. Ltd.",
                 Categories = new[] {
@@ -84,7 +88,9 @@ namespace SolrNet.Tests.Integration.Sample {
             solr.Query(new SolrQueryByField("name", @"3;Furniture"));
             var products = solr.Query(new SolrQueryByRange<decimal>("price", 10m, 100m).Boost(2));
             Assert.AreEqual(1, products.Count);
+            Assert.AreEqual(name, products[0].Name);
             Assert.AreEqual("SP2514N", products[0].Id);
+            Assert.AreEqual(guid, products[0].Guid);
             Assert.AreEqual(92m, products[0].Price);
             Assert.IsNotNull(products[0].Prices);
             Assert.AreEqual(2, products[0].Prices.Count);
@@ -99,7 +105,6 @@ namespace SolrNet.Tests.Integration.Sample {
         public void DeleteByIdAndOrQuery() {
             var solr = ServiceLocator.Current.GetInstance<ISolrOperations<Product>>();
 
-            #region Delete test data
             var products = new List<Product> 
             {
                     new Product
@@ -166,9 +171,8 @@ namespace SolrNet.Tests.Integration.Sample {
                         InStock = false,
                     }
             };
-            #endregion
 
-            solr.Add(products);
+            solr.AddRange(products);
             solr.Commit();
             
             solr.Delete(new[] { "DEL12345", "DEL12346" }, new SolrQueryByField("features", "feature 3"));
@@ -405,6 +409,29 @@ namespace SolrNet.Tests.Integration.Sample {
             Console.WriteLine("CollapsedDocuments.Count {0}", results.Collapsing.CollapsedDocuments.Count);
         }
 
+
+		[Test]
+		public void FieldGrouping()
+		{
+			var solr = ServiceLocator.Current.GetInstance<ISolrBasicOperations<Product>>();
+			var results = solr.Query(SolrQuery.All, new QueryOptions
+			{
+				Grouping = new GroupingParameters()
+				{
+					Fields = new [] { "manu_exact" },
+					Format = GroupingFormat.Grouped,
+					Limit = 1,
+				}
+			});
+			
+			Console.WriteLine("Group.Count {0}", results.Grouping.Count);
+			Assert.AreEqual(1, results.Grouping.Count);
+			Assert.AreEqual(true, results.Grouping.ContainsKey("manu_exact"));
+			Assert.GreaterThanOrEqualTo(results.Grouping["manu_exact"].Groups.Count,1);
+		}
+
+
+
         [Test]
         public void SemiLooseMapping() {
             Add_then_query();
@@ -429,6 +456,19 @@ namespace SolrNet.Tests.Integration.Sample {
             product.OtherFields["features"] = new[] {"a", "b", "c"};
             product.Score = null;
             solr.Add(product);
+        }
+
+        [Test]
+        public void ExtractRequestHandler() {
+            var solr = ServiceLocator.Current.GetInstance<ISolrOperations<Product>>();
+            using (var file = File.OpenRead(@"..\..\test.pdf")) {
+                var response = solr.Extract(new ExtractParameters(file, "abcd") {
+                    ExtractOnly = true,
+                    ExtractFormat = ExtractFormat.Text,
+                });
+                Console.WriteLine(response.Content);
+                Assert.AreEqual("Your PDF viewing software works!\n\n\n", response.Content);
+            }
         }
     }
 }

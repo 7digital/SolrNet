@@ -25,7 +25,7 @@ namespace NHibernate.SolrNet.Impl {
     /// NHibernate event listener for updating Solr index
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class SolrNetListener<T> : ICommitSetting, IAutoFlushEventListener, IFlushEventListener, IPostInsertEventListener, IPostDeleteEventListener, IPostUpdateEventListener where T : class {
+    public class SolrNetListener<T> : IListenerSettings, IAutoFlushEventListener, IFlushEventListener, IPostInsertEventListener, IPostDeleteEventListener, IPostUpdateEventListener where T : class {
         private readonly ISolrOperations<T> solr;
         private readonly WeakHashtable entitiesToAdd = new WeakHashtable();
         private readonly WeakHashtable entitiesToDelete = new WeakHashtable();
@@ -34,6 +34,12 @@ namespace NHibernate.SolrNet.Impl {
         /// Automatically commit Solr after each update
         /// </summary>
         public bool Commit { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parameters to use when adding a document to the index.
+        /// </summary>
+        /// <value>The parameters to use when adding a document to the index.</value>
+        public AddParameters AddParameters { get; set; }
 
         public SolrNetListener(ISolrOperations<T> solr) {
             if (solr == null)
@@ -89,7 +95,7 @@ namespace NHibernate.SolrNet.Impl {
             if (DeferAction(e.Session))
                 Add(e.Session.Transaction, entity);
             else {
-                solr.Add(entity);
+                solr.Add(entity, AddParameters);
                 if (Commit)
                     solr.Commit();
             }
@@ -124,7 +130,7 @@ namespace NHibernate.SolrNet.Impl {
         }
 
         public void OnFlushInternal(AbstractEvent e) {
-            var added = DoWithEntities(entitiesToAdd, e.Session.Transaction, d => solr.Add(d));
+            var added = DoWithEntities(entitiesToAdd, e.Session.Transaction, d => solr.Add(d, AddParameters));
             var deleted = DoWithEntities(entitiesToDelete, e.Session.Transaction, d => solr.Delete(d));
             if (Commit && (added || deleted))
                 solr.Commit();

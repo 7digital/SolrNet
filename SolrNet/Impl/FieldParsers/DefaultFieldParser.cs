@@ -16,6 +16,7 @@
 
 using System;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace SolrNet.Impl.FieldParsers {
     /// <summary>
@@ -35,8 +36,8 @@ namespace SolrNet.Impl.FieldParsers {
                 new NullableFieldParser(new DateTimeFieldParser()),
                 new NullableFieldParser(new DecimalFieldParser()),
                 new NullableFieldParser(new LongFieldParser()),
-                new EnumFieldParser(),
-                new GuidFieldParser(),
+                new NullableFieldParser(new EnumFieldParser()),
+                new NullableFieldParser(new GuidFieldParser()),
                 new CollectionFieldParser(this),
                 new TypeConvertingFieldParser(),
                 new InferringFieldParser(this),
@@ -51,7 +52,7 @@ namespace SolrNet.Impl.FieldParsers {
             return parser.CanHandleType(t);
         }
 
-        public object Parse(XmlNode field, Type t) {
+        public object Parse(XElement field, Type t) {
             return parser.Parse(field, t);
         }
     }

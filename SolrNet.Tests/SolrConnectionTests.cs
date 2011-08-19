@@ -36,8 +36,8 @@ namespace SolrNet.Tests {
 		[Test]
 		[Category("Integration")]
 		[Ignore]
-		public void ActualConnectionTest() {
-			var conn = new SolrConnection(solrURL, new HttpWebRequestFactory());
+		public void ActualConnection() {
+            var conn = new SolrConnection(solrURL) { HttpWebRequestFactory = new HttpWebRequestFactory() };
 			var p = new Dictionary<string, string>();
 			p["version"] = "2.1";
 			p["indent"] = "on";
@@ -47,15 +47,20 @@ namespace SolrNet.Tests {
 
 		[Test]
 		[Category("Integration")]
-		[ExpectedException(typeof (InvalidFieldException))]
 		[Ignore]
-		public void ActualInvalidFieldException() {
-            var conn = new SolrConnection(solrURL, new HttpWebRequestFactory());
+		public void ActualConnectionWithException() {
+            var conn = new SolrConnection(solrURL);
 			var p = new Dictionary<string, string>();
 			p["version"] = "2.1";
 			p["indent"] = "on";
 			p["q"] = "idq:123";
-			Console.WriteLine(conn.Get("/select/", p));
+            try {
+                conn.Get("/select/", p);
+                Assert.Fail("Should have thrown");
+            } catch (SolrConnectionException e) {
+                Console.WriteLine(e);
+                Console.WriteLine(e.Url);
+            }
 		}
 
 		[Test]
@@ -85,7 +90,7 @@ namespace SolrNet.Tests {
                     .Repeat.Once()
                     .Return(new MemoryStream());
 			}).Verify(delegate {
-				var conn = new SolrConnection("https://pepe", reqFactory);
+				var conn = new SolrConnection("https://pepe"){ HttpWebRequestFactory = reqFactory };
 				conn.Get("", new Dictionary<string, string>());
 			});
 		}
@@ -118,9 +123,8 @@ namespace SolrNet.Tests {
                 Expect.Call(response.GetResponseStream())
                     .Repeat.Once()
                     .Return(CompressionUtils.GzipCompressStream("Testing compression"));
-            }).Verify(delegate
-            {
-                var conn = new SolrConnection("http://localhost", reqFactory);
+            }).Verify(delegate {
+                var conn = new SolrConnection("http://localhost") { HttpWebRequestFactory = reqFactory };
                 Assert.AreEqual("Testing compression", conn.Get("", new Dictionary<string, string>()));
             });
         }
@@ -132,8 +136,7 @@ namespace SolrNet.Tests {
             var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
             var request = mocks.DynamicMock<IHttpWebRequest>();
             var response = mocks.DynamicMock<IHttpWebResponse>();
-            With.Mocks(mocks).Expecting(delegate
-            {
+            With.Mocks(mocks).Expecting(delegate {
                 Expect.Call(reqFactory.Create(new UriBuilder().Uri))
                     .IgnoreArguments()
                     .Repeat.Once()
@@ -153,9 +156,8 @@ namespace SolrNet.Tests {
                 Expect.Call(response.GetResponseStream())
                     .Repeat.Once()
                     .Return(CompressionUtils.DeflateCompressStream("Testing compression"));
-            }).Verify(delegate
-            {
-                var conn = new SolrConnection("http://localhost", reqFactory);
+            }).Verify(delegate {
+                var conn = new SolrConnection("http://localhost") { HttpWebRequestFactory = reqFactory };
                 Assert.AreEqual("Testing compression", conn.Get("", new Dictionary<string, string>()));
             });
         }
@@ -187,7 +189,7 @@ namespace SolrNet.Tests {
                     .Repeat.Once()
                     .Return(new MemoryStream());
 			}).Verify(delegate {
-				var conn = new SolrConnection("https://pepe", reqFactory);
+                var conn = new SolrConnection("https://pepe") { HttpWebRequestFactory = reqFactory };
                 conn.Get("", new Dictionary<string, string>());
 			});
 		}
@@ -210,7 +212,7 @@ namespace SolrNet.Tests {
                     .Repeat.Once()
                     .Throw(new WebException());
 			}).Verify(delegate {
-				var conn = new SolrConnection("http://lalala:12345", reqFactory);
+				var conn = new SolrConnection("http://lalala:12345") { HttpWebRequestFactory = reqFactory };
 				conn.Get("", new Dictionary<string, string>());
 			});
 		}
@@ -222,15 +224,17 @@ namespace SolrNet.Tests {
 			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
 			var request = mocks.DynamicMock<IHttpWebRequest>();
 			With.Mocks(mocks).Expecting(delegate {
+                var uri = new Uri("http://lalala:12345/update");
 				Expect.Call(request.GetRequestStream())
                     .Repeat.Once()
                     .Throw(new WebException());
-				Expect.Call(reqFactory.Create(new Uri("http://lalala:12345/update")))
+                Expect.Call(request.RequestUri).Repeat.Once().Return(uri);
+				Expect.Call(reqFactory.Create(uri))
                     .IgnoreArguments()
                     .Repeat.Once()
                     .Return(request);
 			}).Verify(delegate {
-				var conn = new SolrConnection("http://lalala:12345", reqFactory);
+				var conn = new SolrConnection("http://lalala:12345") { HttpWebRequestFactory = reqFactory };
 				conn.Post("/update", "");
 			});
 		}
@@ -240,7 +244,7 @@ namespace SolrNet.Tests {
 		public void InvalidUrl_ShouldThrowException() {
 			var mocks = new MockRepository();
 			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
-			new SolrConnection("http:/locl", reqFactory);
+            new SolrConnection("http:/locl") { HttpWebRequestFactory = reqFactory };
 		}
 
 		[Test]
@@ -253,7 +257,7 @@ namespace SolrNet.Tests {
 				Expect.Call(request.GetRequestStream())
                     .Repeat.Once()
                     .Return(new MemoryStream());
-				Expect.Call(reqFactory.Create(new Uri("https://pepe")))
+				Expect.Call(reqFactory.Create(new Uri("https://pepe/?version=2.2")))
                     .Repeat.Once()
                     .Return(request);
 				request.Method = HttpWebRequestMethod.POST;
@@ -268,32 +272,8 @@ namespace SolrNet.Tests {
                     .Repeat.Once()
                     .Return(new MemoryStream());
 			}).Verify(delegate {
-				var conn = new SolrConnection("https://pepe", reqFactory);
+                var conn = new SolrConnection("https://pepe") { HttpWebRequestFactory = reqFactory };
 				conn.Post("", "");
-			});
-		}
-
-		[Test]
-		[ExpectedException(typeof (InvalidFieldException))]
-		public void UndefinedFieldQueryError_ShouldThrow() {
-			var mocks = new MockRepository();
-			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
-			var request = mocks.DynamicMock<IHttpWebRequest>();
-			With.Mocks(mocks).Expecting(delegate {
-				Expect.Call(reqFactory.Create(new UriBuilder().Uri))
-                    .IgnoreArguments()
-                    .Repeat.Once()
-                    .Return(request);
-                Expect.Call(request.Headers)
-                    .Repeat.Any()
-                    .Return(new WebHeaderCollection());
-				var r = new WebResponseStub {StatusCode = HttpStatusCode.BadRequest};
-				Expect.Call(request.GetResponse())
-                    .Repeat.Once()
-					.Throw(new WebException("(400) Bad Request", new ApplicationException(), WebExceptionStatus.ProtocolError, r));
-			}).Verify(delegate {
-				var conn = new SolrConnection("https://pepe", reqFactory);
-				conn.Get("", new Dictionary<string, string>());
 			});
 		}
 
@@ -301,14 +281,14 @@ namespace SolrNet.Tests {
 		public void UrlHttp_ShouldntThrowException() {
 			var mocks = new MockRepository();
 			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
-			new SolrConnection("http://pepe", reqFactory);
+            new SolrConnection("http://pepe") { HttpWebRequestFactory = reqFactory };
 		}
 
 		[Test]
 		public void UrlHttps_ShouldntThrowException() {
 			var mocks = new MockRepository();
 			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
-			new SolrConnection("https://pepe", reqFactory);
+            new SolrConnection("https://pepe") { HttpWebRequestFactory = reqFactory };
 		}
 
 		[Test]
@@ -316,13 +296,13 @@ namespace SolrNet.Tests {
 		public void UrlNotHttp_ShouldThrowException() {
 			var mocks = new MockRepository();
 			var reqFactory = mocks.StrictMock<IHttpWebRequestFactory>();
-			new SolrConnection("ftp://pepe", reqFactory);
+            new SolrConnection("ftp://pepe") { HttpWebRequestFactory = reqFactory };
 		}
 
         [Test]
         [Ignore]
         public void Cache_mocked() {
-            var conn = new SolrConnection(solrURL, new HttpWebRequestFactory());
+            var conn = new SolrConnection(solrURL);
             var cache = MockRepository.GenerateMock<ISolrCache>();
             cache.Expect(x => x["http://localhost:8983/solr/select/?q=*:*"])
                 .Repeat.Once()
@@ -340,7 +320,7 @@ namespace SolrNet.Tests {
         [Test]
         [Ignore]
         public void Cache() {
-            var conn = new SolrConnection(solrURL, new HttpWebRequestFactory());
+            var conn = new SolrConnection(solrURL);
             var response1 = conn.Get("/select/", new Dictionary<string, string> {
                 {"q", "*:*"},
             });
@@ -352,7 +332,7 @@ namespace SolrNet.Tests {
         [Test]
         [Ignore]
         public void Cache_performance() {
-            var conn = new SolrConnection(solrURL, new HttpWebRequestFactory()) {
+            var conn = new SolrConnection(solrURL) {
                 Cache = new HttpRuntimeCache(),
             };
             TestCache(conn);
@@ -361,7 +341,7 @@ namespace SolrNet.Tests {
         [Test]
         [Ignore]
         public void NoCache_performance() {
-            var conn = new SolrConnection(solrURL, new HttpWebRequestFactory()) {
+            var conn = new SolrConnection(solrURL) {
                 Cache = new NullCache(),
             };
             TestCache(conn);

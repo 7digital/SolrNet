@@ -62,12 +62,24 @@ namespace NHibernate.SolrNet {
         /// <param name="autoCommit"></param>
         /// <returns></returns>
         public Configuration Configure(Configuration config, bool autoCommit) {
+            return Configure(config, autoCommit, null);
+        }
+
+        /// <summary>
+        /// Registers SolrNet's NHibernate listeners
+        /// </summary>
+        /// <param name="config">NHibernate configuration</param>
+        /// <param name="autoCommit">if set to <c>true</c> [auto commit].</param>
+        /// <param name="parameters">The add parameters to use when adding a document to the index.</param>
+        /// <returns></returns>
+        public Configuration Configure(Configuration config, bool autoCommit, AddParameters parameters) {
             foreach (var t in mapper.GetRegisteredTypes()) {
                 var listenerType = typeof (SolrNetListener<>).MakeGenericType(t);
                 var solrType = typeof (ISolrOperations<>).MakeGenericType(t);
                 var solr = provider.GetService(solrType);
-                var listener = (ICommitSetting) Activator.CreateInstance(listenerType, solr);
+                var listener = (IListenerSettings) Activator.CreateInstance(listenerType, solr);
                 listener.Commit = autoCommit;
+                listener.AddParameters = parameters;
                 NHHelper.SetListener(config, listener);
             }
             return config;

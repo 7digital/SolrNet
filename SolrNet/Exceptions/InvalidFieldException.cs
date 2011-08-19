@@ -22,29 +22,31 @@ namespace SolrNet.Exceptions {
     /// Solr did not understand one the specified fields
     /// </summary>
     [Serializable]
+    [Obsolete("No longer thrown, catch SolrNetException or SolrConnectionException instead")]
 	public class InvalidFieldException : SolrNetException {
-        ///<summary>
-        /// The html response from Solr.
-        ///</summary>
-        public string SolrResponse { get; private set; }
+        /// <summary>
+        /// Solr did not understand one the specified fields
+        /// </summary>
+        /// <param name="innerException"></param>
+		public InvalidFieldException(Exception innerException) : base(innerException) {}
 
         /// <summary>
-        /// Solr did not understand one the specified fields.
+        /// Solr did not understand one the specified fields
         /// </summary>
-        /// <param name="message">The response status description.</param>
-        /// <param name="solrResponse">The html response from Solr.</param>
-        /// <param name="innerException">The thrown WebException.</param>
-        public InvalidFieldException(string message, string solrResponse, Exception innerException) 
-            : base(message, innerException) {
-            SolrResponse = solrResponse;
-        }
+        /// <param name="message"></param>
+		public InvalidFieldException(string message) : base(message) {}
 
-        protected InvalidFieldException(SerializationInfo info, StreamingContext context) 
-            : base(info, context) {}
+        /// <summary>
+        /// Solr did not understand one the specified fields
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+		public InvalidFieldException(string message, Exception innerException) : base(message, innerException) {}
 
-        public override string ToString() {
-            return string.Format("{0}{1}Solr Response:{0}{2}", Environment.NewLine, 
-                base.ToString(), SolrResponse);
-        }
+        /// <summary>
+        /// Solr did not understand one the specified fields
+        /// </summary>
+		public InvalidFieldException() {}
+        protected InvalidFieldException(SerializationInfo info, StreamingContext context) : base(info, context) {}
 	}
 }

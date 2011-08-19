@@ -205,8 +205,8 @@ namespace SolrNet.Tests {
             q["hl.fragsize"] = fragsize.ToString();
             q["hl.requireFieldMatch"] = "true";
             q["hl.alternateField"] = alt;
-            q["hl.simple.pre"] = beforeTerm;
-            q["hl.simple.post"] = afterTerm;
+            q["hl.tag.pre"] = beforeTerm;
+            q["hl.tag.post"] = afterTerm;
             q["hl.regex.slop"] = "4.12";
             q["hl.regex.pattern"] = "\\.";
             q["hl.regex.maxAnalyzedChars"] = "8000";
@@ -242,6 +242,24 @@ namespace SolrNet.Tests {
                     Fragmenter = SolrHighlightFragmenter.Regex
                 }
             });
+        }
+
+        [Test]
+        public void HighlightingWithFastVectorHighlighter() {
+            var e = new SolrQueryExecuter<TestDocument>(null, null, null, null);
+            var p = e.GetHighlightingParameters(new QueryOptions {
+                Highlight = new HighlightingParameters {
+                    Fields = new[] {"a"},
+                    AfterTerm = "after",
+                    BeforeTerm = "before",
+                    UseFastVectorHighlighter = true,
+                }
+            });
+            Assert.AreEqual("true", p["hl.useFastVectorHighlighter"]);
+            Assert.AreEqual("before", p["hl.tag.pre"]);
+            Assert.AreEqual("after", p["hl.tag.post"]);
+            Assert.IsFalse(p.ContainsKey("hl.simple.pre"));
+            Assert.IsFalse(p.ContainsKey("hl.simple.post"));
         }
 
         [Test]
@@ -291,6 +309,47 @@ namespace SolrNet.Tests {
             Assert.Contains(p, KVP("spellcheck.dictionary", "spanish"));
             Assert.Contains(p, KVP("spellcheck.onlyMorePopular", "true"));
             Assert.Contains(p, KVP("spellcheck.reload", "true"));
+        }
+
+        [Test]
+        public void Terms()
+        {
+            var mocks = new MockRepository();
+            var parser = mocks.DynamicMock<ISolrQueryResultParser<TestDocument>>();
+            var conn = mocks.DynamicMock<ISolrConnection>();
+            var queryExecuter = new SolrQueryExecuter<TestDocument>(parser, conn, null, null);
+            var p = queryExecuter.GetTermsParameters(new QueryOptions
+            {
+                Terms = new TermsParameters("text")
+                {
+                    Limit = 10,
+                    Lower = "lower",
+                    LowerInclude = true,
+                    MaxCount = 10,
+                    MinCount = 0,
+                    Prefix = "pre",
+                    Raw = true,
+                    Regex = "regex",
+                    RegexFlag = new[] { RegexFlag.CanonEq, RegexFlag.CaseInsensitive },
+                    Sort = TermsSort.Count,
+                    Upper = "upper",
+                    UpperInclude = true
+                },
+            }).ToList();
+            Assert.Contains(p, KVP("terms", "true"));
+            Assert.Contains(p, KVP("terms.fl", "text"));
+            Assert.Contains(p, KVP("terms.lower", "lower"));
+            Assert.Contains(p, KVP("terms.lower.incl", "true"));
+            Assert.Contains(p, KVP("terms.maxcount", "10"));
+            Assert.Contains(p, KVP("terms.mincount", "0"));
+            Assert.Contains(p, KVP("terms.prefix", "pre"));
+            Assert.Contains(p, KVP("terms.raw", "true"));
+            Assert.Contains(p, KVP("terms.regex", "regex"));
+            Assert.Contains(p, KVP("terms.regex.flag", RegexFlag.CanonEq.ToString()));
+            Assert.Contains(p, KVP("terms.regex.flag", RegexFlag.CaseInsensitive.ToString()));
+            Assert.Contains(p, KVP("terms.sort", "count"));
+            Assert.Contains(p, KVP("terms.upper", "upper"));
+            Assert.Contains(p, KVP("terms.upper.incl", "true"));
         }
 
         [Test]
@@ -461,6 +520,41 @@ namespace SolrNet.Tests {
                     Assert.AreEqual("geo", p["qt"]);
                     Assert.AreEqual("1", p["radius"]);
                 });
+        }
+
+        [Test]
+        public void GetClusteringParameters() {
+            var mocks = new MockRepository();
+            var parser = mocks.DynamicMock<ISolrQueryResultParser<TestDocument>>();
+            var conn = mocks.DynamicMock<ISolrConnection>();
+            var querySerializer = new SolrQuerySerializerStub("apache");
+            var queryExecuter = new SolrQueryExecuter<TestDocument>(parser, conn, querySerializer, null);
+            var p = queryExecuter.GetAllParameters(new SolrQuery("apache"), new QueryOptions {
+                Clustering = new ClusteringParameters() {
+                    Title = "headline",
+                    FragSize = 10,
+                    LexicalResources = "fakedir",
+                    ProduceSummary = true,
+                    Algorithm = "org.carrot2.clustering.lingo.LingoClusteringAlgorithm",
+                    Url = "none",
+                    Collection = false,
+                    Engine = "default",
+                    SubClusters = false,
+                    Snippet = "synopsis",
+                    NumDescriptions = 20
+                },
+            }).ToList();
+            Assert.Contains(p, KVP("carrot.title", "headline"));
+            Assert.Contains(p, KVP("clustering.engine", "default"));
+            Assert.Contains(p, KVP("clustering.collection", "false"));
+            Assert.Contains(p, KVP("carrot.algorithm", "org.carrot2.clustering.lingo.LingoClusteringAlgorithm"));
+            Assert.Contains(p, KVP("carrot.url", "none"));
+            Assert.Contains(p, KVP("carrot.snippet", "synopsis"));
+            Assert.Contains(p, KVP("carrot.produceSummary", "true"));
+            Assert.Contains(p, KVP("carrot.fragSize", "10"));
+            Assert.Contains(p, KVP("carrot.numDescriptions", "20"));
+            Assert.Contains(p, KVP("carrot.outputSubClusters", "false"));
+            Assert.Contains(p, KVP("carrot.lexicalResourcesDir", "fakedir"));
         }
     }
 }

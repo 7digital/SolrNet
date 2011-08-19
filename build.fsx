@@ -10,7 +10,7 @@ open System.Xml.Linq
 open Fake
 open Fake.FileUtils
 
-let version = "0.3.0"
+let version = "0.4.0.1001"
 let buildDir = "merged"
 let nugetDir = "nuget"
 let nugetDocs = nugetDir @@ "content"
@@ -45,7 +45,7 @@ Target "Clean" (fun _ ->
 Target "Build" (fun _ -> mainSln "Rebuild")
 Target "BuildSample" (fun _ -> sampleSln "Rebuild")
 
-let libs = ["SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "Ninject.Integration.SolrNet"; "NHibernate.SolrNet"; "StructureMap.SolrNetIntegration"; "AutofacContrib.SolrNet"]
+let libs = ["SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "Ninject.Integration.SolrNet"; "NHibernate.SolrNet"; "StructureMap.SolrNetIntegration"; "AutofacContrib.SolrNet"; "Unity.SolrNetIntegration"]
 let dlls = [for l in libs -> l + ".dll"]
 let dirs = [for l in libs -> l @@ "bin" @@ config]
 
@@ -71,11 +71,8 @@ Target "Coverage" (fun _ ->
 )
 
 Target "IntegrationTest" (fun _ ->
-    Solr.start()
-    try
-        testAssemblies |> Gallio.Run (fun p -> { p with Filters = onlyIntegrationTests })
-    finally
-        Solr.stop()
+    use s = Solr.start()
+    testAssemblies |> Gallio.Run (fun p -> { p with Filters = onlyIntegrationTests })
 )
 
 let merge libraries = 
@@ -145,7 +142,7 @@ Target "NuGet.Windsor" (fun _ ->
         "Castle.Facilities.SolrNetIntegration" 
         "SolrNet.Windsor"
         "Windsor facility for SolrNet"
-        ["Castle.Windsor", "2.5.1"; "SolrNet", "0.3.0"]
+        ["Castle.Windsor", "[2.5.1,2.5.3]"; "SolrNet", version]
 )
 
 Target "NuGet.Ninject" (fun _ ->
@@ -153,7 +150,7 @@ Target "NuGet.Ninject" (fun _ ->
         "Ninject.Integration.SolrNet" 
         "SolrNet.Ninject"
         "Ninject module for SolrNet"
-        ["Ninject", "2.1.0.76"; "SolrNet", "0.3.0"]
+        ["Ninject", "[2.2.0.0,2.2.1.0]"; "SolrNet", version]
 )
 
 Target "NuGet.NHibernate" (fun _ ->
@@ -161,7 +158,7 @@ Target "NuGet.NHibernate" (fun _ ->
         "NHibernate.SolrNet" 
         "SolrNet.NHibernate"
         "NHibernate integration for SolrNet"
-        ["NHibernate.Core", "2.1.2.4000"; "CommonServiceLocator", "1.0"; "SolrNet", "0.3.0"]
+        ["NHibernate", "3.1.0.4000"; "CommonServiceLocator", "1.0"; "SolrNet", version]
 )
 
 Target "NuGet.StructureMap" (fun _ ->
@@ -169,7 +166,7 @@ Target "NuGet.StructureMap" (fun _ ->
         "StructureMap.SolrNetIntegration" 
         "SolrNet.StructureMap"
         "StructureMap registry for SolrNet"
-        ["structuremap", "2.6.1.0"; "SolrNet", "0.3.0"]
+        ["structuremap", "2.6.2.0"; "SolrNet", version]
 )
 
 Target "NuGet.Autofac" (fun _ ->
@@ -177,7 +174,15 @@ Target "NuGet.Autofac" (fun _ ->
         "AutofacContrib.SolrNet" 
         "SolrNet.Autofac"
         "Autofac module for SolrNet"
-        ["Autofac", "2.2.4.900"; "SolrNet", "0.3.0"]
+        ["Autofac", "2.2.4.900"; "SolrNet", version]
+)
+
+Target "NuGet.Unity" (fun _ ->
+    nuGetSingle 
+        "Unity.SolrNetIntegration" 
+        "SolrNet.Unity"
+        "Unity integration for SolrNet"
+        ["Unity", "2.1.505.0"; "SolrNet", version]
 )
 
 Target "ReleasePackage" (fun _ -> 
@@ -189,7 +194,7 @@ Target "ReleasePackage" (fun _ ->
         cp docsFile outputPath
 
     !+ (buildDir @@ "SolrNet.*")
-        ++ "license.txt" ++ "lib\\Microsoft.Practices.*"
+        ++ "license.txt" ++ "lib\\Microsoft.Practices.ServiceLocation.*"
         |> Scan
         |> Copy outputPath
 

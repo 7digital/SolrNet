@@ -31,7 +31,6 @@ using SolrNet.Mapping;
 using SolrNet.Mapping.Validation;
 using SolrNet.Mapping.Validation.Rules;
 using SolrNet.Schema;
-using SolrNet.Utils;
 
 namespace Castle.Facilities.SolrNetIntegration {
     /// <summary>
@@ -88,10 +87,14 @@ namespace Castle.Facilities.SolrNetIntegration {
                 typeof (SpellCheckResponseParser<>),
                 typeof (StatsResponseParser<>),
                 typeof (CollapseResponseParser<>),
+                typeof(GroupingResponseParser<>),
+                typeof(ClusterResponseParser<>),
+                typeof(TermsResponseParser<>)
             }) {
                 Kernel.Register(Component.For(typeof (ISolrResponseParser<>)).ImplementedBy(parserType));
             }
             Kernel.Register(Component.For<ISolrHeaderResponseParser>().ImplementedBy<HeaderResponseParser<string>>());
+            Kernel.Register(Component.For<ISolrExtractResponseParser>().ImplementedBy<ExtractResponseParser>());
             foreach (var validationRule in new[] {
                 typeof(MappedPropertiesIsInSolrSchemaRule),
                 typeof(RequiredFieldsAreMappedRule),
@@ -124,6 +127,7 @@ namespace Castle.Facilities.SolrNetIntegration {
             Kernel.Register(Component.For<ISolrDocumentPropertyVisitor>().ImplementedBy<DefaultDocumentVisitor>());
 
             Kernel.Register(Component.For<ISolrSchemaParser>().ImplementedBy<SolrSchemaParser>());
+            Kernel.Register(Component.For<ISolrDIHStatusParser>().ImplementedBy<SolrDIHStatusParser>());
             Kernel.Register(Component.For<IMappingValidator>().ImplementedBy<MappingValidator>());
 
             AddCoresFromConfig();

@@ -22,12 +22,14 @@ namespace SolrNet.Impl.QuerySerializers {
         public override string Serialize(SolrQueryByField q) {
             if (q.FieldName == null || q.FieldValue == null)
                 return null;
-            return string.Format("{0}:{1}", q.FieldName, quote(q.FieldValue));
+            return string.Format("({0}:{1})", q.FieldName, q.Quoted ? Quote(q.FieldValue) : q.FieldValue);
         }
 
-        public string quote(string value) {
-            string r = Regex.Replace(value, "(\\+|\\-|\\&\\&|\\|\\||\\!|\\{|\\}|\\[|\\]|\\^|\\(|\\)|\\\"|\\~|\\:|\\;|\\\\)", "\\$1");
-            if (r.IndexOf(' ') != -1)
+        public static readonly Regex SpecialCharactersRx = new Regex("(\\+|\\-|\\&\\&|\\|\\||\\!|\\{|\\}|\\[|\\]|\\^|\\(|\\)|\\\"|\\~|\\:|\\;|\\\\|\\?|\\*)", RegexOptions.Compiled);
+
+        public static string Quote(string value) {
+            string r = SpecialCharactersRx.Replace(value, "\\$1");
+            if (r.IndexOf(' ') != -1 || r == "")
                 r = string.Format("\"{0}\"", r);
             return r;
         }

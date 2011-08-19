@@ -88,8 +88,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtractCommandTests.cs" />
     <Compile Include="AddCommandTests.cs" />
     <Compile Include="AllPropertiesMappingManagerTests.cs" />
     <Compile Include="AttributesMappingManagerTests.cs" />
@@ -106,7 +108,6 @@
     <Compile Include="ExceptionTests.cs" />
     <Compile Include="FieldParserTests.cs" />
     <Compile Include="FilterQueryTests.cs" />
-    <Compile Include="FuncTests.cs" />
     <Compile Include="HttpTests.cs" />
     <Compile Include="Integration.Sample\Product.cs" />
     <Compile Include="Integration.Sample\ProductLoose.cs" />
@@ -123,8 +124,12 @@
     <Compile Include="OperatorOverloadingTests.cs" />
     <Compile Include="OptimizeCommandTests.cs" />
     <Compile Include="RequiredFieldsAreMappedRuleTests.cs" />
+    <Compile Include="ServiceLocatorTestCase.cs" />
+    <Compile Include="SolrDIHStatusParserTest.cs" />
     <Compile Include="SolrDictionarySerializerTests.cs" />
     <Compile Include="MappingValidatorTests.cs" />
+    <Compile Include="SolrFacetPivotQueryTest.cs" />
+    <Compile Include="SolrQueryByDistanceTests.cs" />
     <Compile Include="SolrQuerySerializerStub.cs" />
     <Compile Include="SolrSchemaParserTests.cs" />
     <Compile Include="UniqueKeyMatchesMappingRuleTests.cs" />
@@ -161,9 +166,12 @@
     <Compile Include="SortOrderTests.cs" />
     <Compile Include="ThreadHelper.cs" />
     <Compile Include="TypeHelperTests.cs" />
-    <Compile Include="Utils\XmlUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Castle.Facilities.SolrNetIntegration\Castle.Facilities.SolrNetIntegration.csproj">
+      <Project>{0F21F5B6-5986-4301-B0F7-FD9800DB8091}</Project>
+      <Name>Castle.Facilities.SolrNetIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HttpWebAdapters\HttpWebAdapters.csproj">
       <Project>{AE7D2A46-3F67-4986-B04B-7DCE79A549A5}</Project>
       <Name>HttpWebAdapters</Name>
@@ -177,6 +185,9 @@
     <None Include="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Resources\responseWithExtractContent.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\solrSchemaBasic.xml" />
@@ -202,6 +213,8 @@
     <EmbeddedResource Include="Resources\responseWithStats.xml" />
     <EmbeddedResource Include="Resources\partialResponseWithDateFacet.xml" />
     <EmbeddedResource Include="Resources\partialResponseWithDateFacetAndOther.xml" />
+    <EmbeddedResource Include="Resources\responseWithGroupingOnInstock.xml" />
+    <EmbeddedResource Include="Resources\responseWithFacetPivoting.xml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\collapseResponse.xml" />
@@ -225,6 +238,15 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\solrDIHStatusBasic.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\responseWithClustering.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\responseWithTerms.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -16,13 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml;
-using SolrNet.Commands;
+using System.IO;
+using System.Linq;
 using SolrNet.Commands.Parameters;
 using SolrNet.Exceptions;
 using SolrNet.Mapping.Validation;
 using SolrNet.Schema;
-using SolrNet.Utils;
 
 namespace SolrNet.Impl {
     /// <summary>
@@ -121,15 +120,51 @@ namespace SolrNet.Impl {
         }
 
         public ResponseHeader AddWithBoost(T doc, double boost) {
-            return ((ISolrOperations<T>)this).AddWithBoost(new[] { new KeyValuePair<T, double?>(doc, boost) });
+            return AddWithBoost(doc, boost, null);
         }
 
+        public ResponseHeader AddWithBoost(T doc, double boost, AddParameters parameters) {
+            return ((ISolrOperations<T>)this).AddRangeWithBoost(new[] { new KeyValuePair<T, double?>(doc, boost) }, parameters);
+        }
+
+        public ExtractResponse Extract(ExtractParameters parameters) {
+            return basicServer.Extract(parameters);
+        }
+
+        [Obsolete("Use AddRange instead")]
         public ResponseHeader Add(IEnumerable<T> docs) {
-            return basicServer.AddWithBoost(Func.Select(docs, d => new KeyValuePair<T, double?>(d, null)));
+            return Add(docs, null);
         }
 
+        public ResponseHeader AddRange(IEnumerable<T> docs) {
+            return AddRange(docs, null);
+        }
+
+        [Obsolete("Use AddRange instead")]
+        public ResponseHeader Add(IEnumerable<T> docs, AddParameters parameters) {
+            return basicServer.AddWithBoost(docs.Select(d => new KeyValuePair<T, double?>(d, null)), parameters);
+        }
+
+        public ResponseHeader AddRange(IEnumerable<T> docs, AddParameters parameters) {
+            return basicServer.AddWithBoost(docs.Select(d => new KeyValuePair<T, double?>(d, null)), parameters);
+        }
+
+        [Obsolete("Use AddRangeWithBoost instead")]
         ResponseHeader ISolrOperations<T>.AddWithBoost(IEnumerable<KeyValuePair<T, double?>> docs) {
-            return basicServer.AddWithBoost(docs);
+            return ((ISolrOperations<T>)this).AddWithBoost(docs, null);
+        }
+
+        public ResponseHeader AddRangeWithBoost(IEnumerable<KeyValuePair<T, double?>> docs) {
+            return ((ISolrOperations<T>)this).AddRangeWithBoost(docs, null);
+        }
+
+        [Obsolete("Use AddRangeWithBoost instead")]
+        ResponseHeader ISolrOperations<T>.AddWithBoost(IEnumerable<KeyValuePair<T, double?>> docs, AddParameters parameters) {
+            return basicServer.AddWithBoost(docs, parameters);
+        }
+
+        public ResponseHeader AddRangeWithBoost(IEnumerable<KeyValuePair<T, double?>> docs, AddParameters parameters) {
+            return basicServer.AddWithBoost(docs, parameters);
         }
 
         public ResponseHeader Delete(IEnumerable<string> ids) {
@@ -142,7 +177,7 @@ namespace SolrNet.Impl {
         }
 
         public ResponseHeader Delete(IEnumerable<T> docs) {
-            return basicServer.Delete(Func.Select(docs, d => {
+            return basicServer.Delete(docs.Select(d => {
                 var uniqueKey = mappingManager.GetUniqueKey(typeof (T));
                 if (uniqueKey == null)
                     throw new SolrNetException(string.Format("This operation requires a unique key, but type '{0}' has no declared unique key", typeof(T)));
@@ -175,6 +210,14 @@ namespace SolrNet.Impl {
         }
 
         /// <summary>
+        /// Rollbacks all add/deletes made to the index since the last commit.
+        /// </summary>
+        /// <returns></returns>
+        public ResponseHeader Rollback() {
+            return basicServer.Rollback();
+        }
+
+        /// <summary>
         /// Commits posts, 
         /// blocking until index changes are flushed to disk and
         /// blocking until a new searcher is opened and registered as the main query searcher, making the changes visible.
@@ -184,7 +227,11 @@ namespace SolrNet.Impl {
         }
 
         public ResponseHeader Add(T doc) {
-            return Add(new[] { doc });
+            return Add(doc, null);
+        }
+
+        public ResponseHeader Add(T doc, AddParameters parameters) {
+            return AddRange(new[] { doc }, parameters);
         }
 
         public SolrSchema GetSchema() {
@@ -194,6 +241,16 @@ namespace SolrNet.Impl {
         public IEnumerable<ValidationResult> EnumerateValidationResults() {
             var schema = GetSchema();
             return _schemaMappingValidator.EnumerateValidationResults(typeof(T), schema);
+        }
+
+        /// <summary>
+        /// Gets the DIH Status.
+        /// </summary>
+        /// <param name="options">command options</param>
+        /// <returns>A XmlDocument containing the DIH Status XML.</returns>
+        public SolrDIHStatus GetDIHStatus(KeyValuePair<string, string> options)
+        {
+            return basicServer.GetDIHStatus(options);
         }
     }
 }

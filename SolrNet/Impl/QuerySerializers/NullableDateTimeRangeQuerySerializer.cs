@@ -17,7 +17,7 @@
 #endregion
 
 using System;
-using SolrNet.Utils;
+using System.Linq;
 
 namespace SolrNet.Impl.QuerySerializers {
     public class NullableDateTimeRangeQuerySerializer : SingleTypeQuerySerializer<SolrQueryByRange<DateTime?>> {
@@ -28,11 +28,13 @@ namespace SolrNet.Impl.QuerySerializers {
         }
 
         public string SerializeSingle(object o) {
-            return Func.First(fieldSerializer.Serialize(o)).FieldValue;
+            if (o == null)
+                return "*";
+            return fieldSerializer.Serialize(o).First().FieldValue;
         }
 
         public override string Serialize(SolrQueryByRange<DateTime?> q) {
-            return RangeQuerySerializer.BuildRange(q.FieldName, SerializeSingle(q.From), SerializeSingle(q.To), q.Inclusive);
+            return RangeQuerySerializer.BuildRange(q.FieldName, SerializeSingle(q.From), SerializeSingle(q.To), q.InclusiveFrom, q.InclusiveTo);
         }
     }
 }
