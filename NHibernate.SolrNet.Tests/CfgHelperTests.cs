@@ -15,10 +15,10 @@
 #endregion
 
 using System;
-using MbUnit.Framework;
 using Microsoft.Practices.ServiceLocation;
 using NHibernate.Event;
 using NHibernate.SolrNet.Impl;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet;
 
@@ -37,11 +37,11 @@ namespace NHibernate.SolrNet.Tests {
             var nhConfig = ConfigurationExtensions.GetNhConfig();
             var helper = new CfgHelper();
             helper.Configure(nhConfig, true);
-            Assert.GreaterThan(nhConfig.EventListeners.PostInsertEventListeners.Length, 0);
-            Assert.GreaterThan(nhConfig.EventListeners.PostUpdateEventListeners.Length, 0);
-            Assert.GreaterThan(nhConfig.EventListeners.PostDeleteEventListeners.Length, 0);
+            Assert.That(nhConfig.EventListeners.PostInsertEventListeners.Length, Is.GreaterThan(0));
+            Assert.That(nhConfig.EventListeners.PostUpdateEventListeners.Length, Is.GreaterThan(0));
+            Assert.That(nhConfig.EventListeners.PostDeleteEventListeners.Length, Is.GreaterThan(0));
             var listener = nhConfig.EventListeners.PostInsertEventListeners[0];
-            Assert.IsInstanceOfType<SolrNetListener<Entity>>(listener);
+            Assert.That(listener, Is.InstanceOf<SolrNetListener<Entity>>());
         }
 
         [Test]
@@ -55,11 +55,11 @@ namespace NHibernate.SolrNet.Tests {
             provider.Expect(x => x.GetService(typeof (ISolrOperations<Entity>))).Return(solr);
             var helper = new CfgHelper(provider);
             helper.Configure(nhConfig, true);
-            Assert.GreaterThan(nhConfig.EventListeners.PostInsertEventListeners.Length, 0);
-            Assert.GreaterThan(nhConfig.EventListeners.PostUpdateEventListeners.Length, 0);
-            Assert.GreaterThan(nhConfig.EventListeners.PostDeleteEventListeners.Length, 0);
+            Assert.That(nhConfig.EventListeners.PostInsertEventListeners.Length, Is.GreaterThan(0));
+            Assert.That(nhConfig.EventListeners.PostUpdateEventListeners.Length, Is.GreaterThan(0));
+			Assert.That(nhConfig.EventListeners.PostDeleteEventListeners.Length, Is.GreaterThan(0));
             var listener = nhConfig.EventListeners.PostInsertEventListeners[0];
-            Assert.IsInstanceOfType<SolrNetListener<Entity>>(listener);
+			Assert.That(listener, Is.InstanceOf<SolrNetListener<Entity>>());
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace NHibernate.SolrNet.Tests {
             var helper = new CfgHelper(provider);
             helper.Configure(nhConfig, true, addParameters);
             var listener = nhConfig.EventListeners.PostInsertEventListeners[0];
-            Assert.IsInstanceOfType<SolrNetListener<Entity>>(listener);
+			Assert.That(listener, Is.InstanceOf<SolrNetListener<Entity>>());
             Assert.AreEqual(addParameters, ((IListenerSettings)listener).AddParameters);
         }
 
@@ -96,6 +96,5 @@ namespace NHibernate.SolrNet.Tests {
             helper.Configure(nhConfig, true);
             Assert.AreEqual(2, nhConfig.EventListeners.PostInsertEventListeners.Length);
         }
-
     }
 }

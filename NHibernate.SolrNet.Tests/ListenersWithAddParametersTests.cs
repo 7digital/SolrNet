@@ -16,6 +16,7 @@
 
 using MbUnit.Framework;
 using NHibernate.SolrNet.Impl;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet;
 

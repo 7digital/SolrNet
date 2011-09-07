@@ -19,6 +19,7 @@ using System.ComponentModel.Design;
 using MbUnit.Framework;
 using NHibernate.SolrNet.Impl;
 using NHibernate.Tool.hbm2ddl;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet;
 
