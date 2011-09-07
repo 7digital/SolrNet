@@ -1,5 +1,5 @@
 using System.Configuration;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet;
 using SolrNet.Impl;
 using StructureMap.Configuration.DSL;
