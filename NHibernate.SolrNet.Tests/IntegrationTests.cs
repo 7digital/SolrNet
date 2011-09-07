@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using NUnit.Framework;
 using log4net.Config;
 using MbUnit.Framework;
 using Microsoft.Practices.ServiceLocation;
@@ -31,7 +32,7 @@ namespace NHibernate.SolrNet.Tests {
     [TestFixture]
     [Category("Integration")]
     public class IntegrationTests {
-        [Test]
+        [Test, Ignore()]
         public void Insert() {
             using (var session = sessionFactory.OpenSession()) {
                 session.Save(new Entity {
@@ -93,13 +94,14 @@ namespace NHibernate.SolrNet.Tests {
             var propertyVisitor = new DefaultDocumentVisitor(mapper, Startup.Container.GetInstance<ISolrFieldParser>());
             Startup.Container.Register<ISolrDocumentPropertyVisitor>(c => propertyVisitor);
 
-            Startup.Init<Entity>("http://localhost:8983/solr");
+			
+        	Startup.Init<Entity>(_baseSolr);
             var solr = ServiceLocator.Current.GetInstance<ISolrOperations<Entity>>();
             solr.Delete(SolrQuery.All);
             solr.Commit();
         }
 
-        [FixtureSetUp]
+        [TestFixtureSetUp]
         public void FixtureSetup() {
             BasicConfigurator.Configure();
             SetupSolr();
@@ -111,13 +113,14 @@ namespace NHibernate.SolrNet.Tests {
             sessionFactory = cfg.BuildSessionFactory();
         }
 
-        [FixtureTearDown]
-        public void FixtureTearDown() {
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown() {
             sessionFactory.Dispose();
         }
 
         private Configuration cfg;
         private CfgHelper cfgHelper;
         private ISessionFactory sessionFactory;
+    	private string _baseSolr = "http://slave-solr-systest.7digital.systest:8080/solr/solrnet-test/";
     }
 }
