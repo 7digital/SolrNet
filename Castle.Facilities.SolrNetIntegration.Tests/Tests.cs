@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Reflection;
 using Castle.Core.Configuration;
 using Castle.Core.Resource;
@@ -24,7 +25,7 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Castle.Windsor.Configuration.Interpreters;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet;
 using SolrNet.Impl;
@@ -33,6 +34,9 @@ using SolrNet.Mapping.Validation;
 namespace Castle.Facilities.SolrNetIntegration.Tests {
     [TestFixture]
     public class Tests {
+
+		private readonly string _solrUrl = ConfigurationManager.AppSettings["Solr.Baseline"];
+
         [Test]
         [ExpectedException(typeof(FacilityException))]
         public void NoConfig_throws() {
@@ -67,7 +71,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
         public void Ping_Query() {
             var configStore = new DefaultConfigurationStore();
             var configuration = new MutableConfiguration("facility");
-            configuration.CreateChild("solrURL", "http://localhost:8983/solr");
+			configuration.CreateChild("solrURL", _solrUrl);
             configStore.AddFacilityConfiguration("solr", configuration);
             var container = new WindsorContainer(configStore);
             container.AddFacility<SolrNetFacility>("solr");
@@ -80,7 +84,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
         [Test]
         public void ReplacingMapper() {
             var mapper = MockRepository.GenerateMock<IReadOnlyMappingManager>();
-            var solrFacility = new SolrNetFacility("http://localhost:8983/solr") {Mapper = mapper};
+            var solrFacility = new SolrNetFacility(_solrUrl) {Mapper = mapper};
             var container = new WindsorContainer();
             container.AddFacility("solr", solrFacility);
             var m = container.Resolve<IReadOnlyMappingManager>();
@@ -164,7 +168,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
             container.Resolve<ISolrOperations<Document>>();
         }
 
-        [Test]
+        [Test, Ignore("Not used in our fork")]
         public void AddCore() {
             const string core0url = "http://localhost:8983/solr/core0";
             const string core1url = "http://localhost:8983/solr/core1";
@@ -178,7 +182,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
             TestCores(container);
         }
 
-        [Test]
+        [Test, Ignore("Not used in our fork")]
         public void AddCoreFromXML() {
             var solrFacility = new SolrNetFacility();
             var container = new WindsorContainer(new XmlInterpreter(new StaticContentResource(@"<castle>
@@ -219,40 +223,37 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
                 }
             };
 
-            Assert.IsInstanceOfType<ISolrOperations<Document>>(container.Resolve<ISolrOperations<Document>>("core0-id"));
-            Assert.IsInstanceOfType<ISolrOperations<Document>>(container.Resolve<ISolrOperations<Document>>("core1-id"));
-            Assert.IsInstanceOfType<ISolrOperations<Core1Entity>>(container.Resolve<ISolrOperations<Core1Entity>>("core2-id"));
+			Assert.That(container.Resolve<ISolrOperations<Document>>("core0-id"), Is.InstanceOf<ISolrOperations<Document>>());
+			Assert.That(container.Resolve<ISolrOperations<Document>>("core1-id"), Is.InstanceOf<ISolrOperations<Document>>());
+			Assert.That(container.Resolve<ISolrOperations<Core1Entity>>("core2-id"), Is.InstanceOf<ISolrOperations<Document>>());
         }
 
         [Test]
         [Category("Integration")]
-        public void DictionaryDocument() {
-            var solrFacility = new SolrNetFacility("http://localhost:8983/solr");
+        public void Can_add_selecte_and_remove_document() {
+            var solrFacility = new SolrNetFacility(_solrUrl);
             var container = new WindsorContainer();
             container.AddFacility("solr", solrFacility);
             var solr = container.Resolve<ISolrOperations<Dictionary<string, object>>>();
+        	var dictionary = new Dictionary<string, object> {
+        		{"id", "ababa"},
+        		{"manu", "who knows"},
+        		{"popularity", 55},
+        		{"timestamp", DateTime.UtcNow},
+        	};
+        	solr.Add(dictionary);
+        	solr.Commit();
             var results = solr.Query(SolrQuery.All);
-            Assert.GreaterThan(results.Count, 0);
+            Assert.That(results.Count, Is.GreaterThan(0));
             foreach (var d in results) {
-                Assert.GreaterThan(d.Count, 0);
-                foreach (var kv in d)
-                    Console.WriteLine("{0}: {1}", kv.Key, kv.Value);
+                Assert.That(d.Count, Is.GreaterThan(0));
+				foreach (var kv in d) {
+					Console.WriteLine("{0}: {1}", kv.Key, kv.Value);
+					break;
+				}
+            	break;
             }
-        }
-
-        [Test]
-        [Category("Integration")]
-        public void DictionaryDocument_add() {
-            var solrFacility = new SolrNetFacility("http://localhost:8983/solr");
-            var container = new WindsorContainer();
-            container.AddFacility("solr", solrFacility);
-            var solr = container.Resolve<ISolrOperations<Dictionary<string, object>>>();
-            solr.Add(new Dictionary<string, object> {
-                {"id", "ababa"},
-                {"manu", "who knows"},
-                {"popularity", 55},
-                {"timestamp", DateTime.UtcNow},
-            });
+			solr.Delete("ababa");
         }
 
         [Test]
@@ -269,7 +270,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
             var container = new WindsorContainer();
             container.AddFacility("solr", solrFacility);
             var parser = container.Resolve<ISolrDocumentResponseParser<Dictionary<string, object>>>();
-            Assert.IsInstanceOfType<SolrDictionaryDocumentResponseParser>(parser);
+            Assert.That(parser, Is.InstanceOfType<SolrDictionaryDocumentResponseParser>());
         }
 
         [Test]
@@ -278,7 +279,7 @@ namespace Castle.Facilities.SolrNetIntegration.Tests {
             var container = new WindsorContainer();
             container.AddFacility("solr", solrFacility);
             var serializer = container.Resolve<ISolrDocumentSerializer<Dictionary<string, object>>>();
-            Assert.IsInstanceOfType<SolrDictionarySerializer>(serializer);
+			Assert.That(serializer, Is.InstanceOf<SolrDictionarySerializer>());
         }
 
         [Test]
