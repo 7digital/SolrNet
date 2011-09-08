@@ -45,7 +45,8 @@ Target "Clean" (fun _ ->
 Target "Build" (fun _ -> mainSln "Rebuild")
 Target "BuildSample" (fun _ -> sampleSln "Rebuild")
 
-let libs = ["SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "Ninject.Integration.SolrNet"; "NHibernate.SolrNet"; "StructureMap.SolrNetIntegration"; "AutofacContrib.SolrNet"; "Unity.SolrNetIntegration"]
+let libs = [ "SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "NHibernate.SolrNet"; "StructureMap.SolrNetIntegration"; ]
+
 let dlls = [for l in libs -> l + ".dll"]
 let dirs = [for l in libs -> l @@ "bin" @@ config]
 
@@ -108,6 +109,8 @@ Target "Version" (fun _ ->
                                     AssemblyProduct = l
                                     AssemblyInformationalVersion = Git.sha1()
                                     AssemblyCopyright = "Copyright Mauricio Scheffer 2007-" + DateTime.Now.Year.ToString()
+                                                      + " Copyright James Atherton and Greg Sochanik  2011-" 
+                                                      + DateTime.Now.Year.ToString()
                                     Guid = "6688f9b4-5f2d-4fd6-aafc-3a81c84a69f1"
                                     AssemblyVersion = version
                                     AssemblyFileVersion = version })
@@ -145,14 +148,6 @@ Target "NuGet.Windsor" (fun _ ->
         ["Castle.Windsor", "[2.5.1,2.5.3]"; "SolrNet", version]
 )
 
-Target "NuGet.Ninject" (fun _ ->
-    nuGetSingle 
-        "Ninject.Integration.SolrNet" 
-        "SolrNet.Ninject"
-        "Ninject module for SolrNet"
-        ["Ninject", "[2.2.0.0,2.2.1.0]"; "SolrNet", version]
-)
-
 Target "NuGet.NHibernate" (fun _ ->
     nuGetSingle 
         "NHibernate.SolrNet" 
@@ -167,22 +162,6 @@ Target "NuGet.StructureMap" (fun _ ->
         "SolrNet.StructureMap"
         "StructureMap registry for SolrNet"
         ["structuremap", "2.6.2.0"; "SolrNet", version]
-)
-
-Target "NuGet.Autofac" (fun _ ->
-    nuGetSingle 
-        "AutofacContrib.SolrNet" 
-        "SolrNet.Autofac"
-        "Autofac module for SolrNet"
-        ["Autofac", "2.2.4.900"; "SolrNet", version]
-)
-
-Target "NuGet.Unity" (fun _ ->
-    nuGetSingle 
-        "Unity.SolrNetIntegration" 
-        "SolrNet.Unity"
-        "Unity integration for SolrNet"
-        ["Unity", "2.1.505.0"; "SolrNet", version]
 )
 
 Target "ReleasePackage" (fun _ -> 
@@ -256,7 +235,6 @@ Target "PackageSampleApp" (fun _ ->
     !! (buildDir @@ "**\\*")
         |> Zip buildDir ("SolrNet-"+version+"-sample.zip")
 )
-
 
 Target "BuildAll" DoNothing
 Target "TestAndRelease" DoNothing
