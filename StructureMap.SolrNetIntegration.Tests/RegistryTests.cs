@@ -24,7 +24,6 @@ namespace StructureMap.SolrNetIntegration.Tests
             Assert.IsNotNull(m);            
         }
 
-		[Ignore("Needs fixing")]
         [Test]
         public void RegistersSolrConnectionWithAppConfigServerUrl() {
             SetupContainer();
@@ -35,7 +34,6 @@ namespace StructureMap.SolrNetIntegration.Tests
             Assert.AreEqual(_solrUrl+ "entity", solrConnection.ServerURL);
         }
 
-		[Ignore("Needs fixing")]
         [Test, Category("Integration")]
         public void Ping_And_Query()
         {
@@ -134,13 +132,19 @@ namespace StructureMap.SolrNetIntegration.Tests
             var solrDict = ObjectFactory.GetInstance<ISolrOperations<Dictionary<string, object>>>();
         }
 
-		[Ignore ("Needs fixing")]
         [Test, Category("Integration")]
         public void DictionaryDocument()
         {
             SetupContainer();
-
-            var solr = ObjectFactory.Container.GetInstance<ISolrOperations<Dictionary<string, object>>>();
+			var solr = ObjectFactory.Container.GetInstance<ISolrOperations<Dictionary<string, object>>>();
+			solr.Add(new Dictionary<string, object> 
+            {
+                {"id", "ababa"},
+                {"manu", "who knows"},
+                {"popularity", 55},
+                {"timestamp", DateTime.UtcNow},
+            });
+        	solr.Commit();
             var results = solr.Query(SolrQuery.All);
             Assert.That(results.Count, Is.GreaterThan( 0));
             foreach (var d in results)
@@ -149,9 +153,9 @@ namespace StructureMap.SolrNetIntegration.Tests
                 foreach (var kv in d)
                     Console.WriteLine("{0}: {1}", kv.Key, kv.Value);
             }
+        	solr.Delete(SolrQuery.All);
         }
 
-		[Ignore("Needs fixing")]
         [Test, Category("Integration")]
         public void DictionaryDocument_add()
         {

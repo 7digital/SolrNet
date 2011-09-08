@@ -241,7 +241,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\solrDIHStatusBasic.xml" />
+    <EmbeddedResource Include="Resources\solrDIHStatusBasic.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\responseWithClustering.xml" />
