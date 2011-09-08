@@ -31,7 +31,7 @@ namespace StructureMap.SolrNetIntegration.Tests
 
             var solrConnection = (SolrConnection)ObjectFactory.Container.GetInstance<ISolrConnection>(instanceKey);
 
-            Assert.AreEqual(_solrUrl+ "entity", solrConnection.ServerURL);
+            Assert.AreEqual(_solrUrl, solrConnection.ServerURL);
         }
 
         [Test, Category("Integration")]
