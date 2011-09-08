@@ -15,7 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Exceptions;
 using SolrNet.Impl.FieldSerializers;
 using SolrNet.Impl.QuerySerializers;
@@ -24,9 +24,9 @@ namespace SolrNet.Tests {
     [TestFixture]
     public class LocalParamsTests {
         [Test]
-        [Factory("ParamsFactory")]
+        [TestCaseSource("ParamsFactory")]
         public void Serialize(Dictionary<string, string> s, string result) {
-            Assert.AreEqual(result, new LocalParams(s).ToString());
+			Assert.AreEqual(result, new LocalParams(s).ToString());
         }
 
         public string SerializeQuery(object q) {

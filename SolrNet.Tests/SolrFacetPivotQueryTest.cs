@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Impl.FacetQuerySerializers;
 
 namespace SolrNet.Tests
@@ -19,8 +19,8 @@ namespace SolrNet.Tests
 			};
 
             var r = serializer.Serialize(q);
-			Assert.Contains(r, KV("facet.pivot", "manu_exact,inStock"));
-			Assert.Contains(r, KV("facet.pivot.mincount", "1"));
+			Assert.That(r, Contains.Item(KV("facet.pivot", "manu_exact,inStock")));
+			Assert.That(r, Contains.Item(KV("facet.pivot.mincount", "1")));
 		}
 
 		[Test]
@@ -32,10 +32,10 @@ namespace SolrNet.Tests
 			};
 
             var r = serializer.Serialize(q);
-			Assert.Contains(r, KV("facet.pivot", "manu_exact,inStock"));
+			Assert.That(r, Contains.Item(KV("facet.pivot", "manu_exact,inStock")));
 			foreach(var kvPair in r)
 			{
-				Assert.DoesNotContain(kvPair.Key, "facet.pivot.mincount");
+				Assert.That(kvPair.Key, !Contains.Item("facet.pivot.mincount"));
 			}
 			
 		}
@@ -49,9 +49,9 @@ namespace SolrNet.Tests
 			};
 
             var r = serializer.Serialize(q);
-			Assert.Contains(r, KV("facet.pivot", "manu_exact,inStock"));
-			Assert.Contains(r, KV("facet.pivot", "inStock,cat"));
-			Assert.Contains(r, KV("facet.pivot.mincount", "1"));
+			Assert.That(r, Contains.Item(KV("facet.pivot", "manu_exact,inStock")));
+			Assert.That(r, Contains.Item(KV("facet.pivot", "inStock,cat")));
+			Assert.That(r, !Contains.Item(KV("facet.pivot", "1")));
 		}
 
 		public KeyValuePair<K, V> KV<K, V>(K key, V value)

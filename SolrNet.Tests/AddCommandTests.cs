@@ -16,7 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet.Attributes;
 using SolrNet.Commands;
@@ -235,10 +235,10 @@ namespace SolrNet.Tests {
             var xml = cmd.ConvertToXml();
             xml = cmd.RemoveControlCharacters(xml);
             Console.WriteLine(xml);
-            Assert.DoesNotContain(xml, "&#x7;");
-            Assert.DoesNotContain(xml, "&#x1;");
-            Assert.DoesNotContain(xml, "&#x1F;");
-            Assert.DoesNotContain(xml, "&#xFFFE;");
+			Assert.That(xml, Is.Not.StringContaining("&#x7;"));
+			Assert.That(xml, Is.Not.StringContaining("&#x1;"));
+			Assert.That(xml, Is.Not.StringContaining("&#x1F;"));
+			Assert.That(xml, Is.Not.StringContaining("&#xFFFE;"));
         }
 
         [Test]
@@ -250,11 +250,11 @@ namespace SolrNet.Tests {
             };
             var cmd = new AddCommand<TestDocWithString>(docs, docSerializer, null);
             var xml = cmd.RemoveControlCharacters("control &#x7; &#x1; &#x9; &#x1F; &#xFFFE;");
-            Assert.DoesNotContain(xml, "&#x7;");
-            Assert.DoesNotContain(xml, "&#x1;");
-            Assert.DoesNotContain(xml, "&#x1F;");
-            Assert.DoesNotContain(xml, "&#xFFFE;");
-            Assert.Contains(xml, "&#x9;");
+			Assert.That(xml, Is.Not.StringContaining("&#x7;"));
+			Assert.That(xml, Is.Not.StringContaining("&#x1;"));
+			Assert.That(xml, Is.Not.StringContaining("&#x1F;"));
+			Assert.That(xml, Is.Not.StringContaining("&#xFFFE;"));
+			Assert.That(xml, Is.StringContaining("&#x9;"));
         }
 	}
 }

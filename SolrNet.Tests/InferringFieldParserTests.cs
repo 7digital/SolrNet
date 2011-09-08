@@ -15,9 +15,8 @@
 #endregion
 
 using System.Collections;
-using System.Xml;
 using System.Xml.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Impl.FieldParsers;
 
 namespace SolrNet.Tests {
@@ -32,7 +31,7 @@ namespace SolrNet.Tests {
             doc.Add(node);
             var parser = new InferringFieldParser(new DefaultFieldParser());
             var value = parser.Parse(node, typeof (object));
-            Assert.IsInstanceOfType<ArrayList>(value);
+            Assert.That(value,Is.TypeOf<ArrayList>());
         }
     }
 }

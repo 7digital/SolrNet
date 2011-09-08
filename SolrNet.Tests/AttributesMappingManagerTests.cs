@@ -16,7 +16,7 @@
 
 using System;
 using System.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Attributes;
 using SolrNet.Exceptions;
 using SolrNet.Mapping;
@@ -89,11 +89,11 @@ namespace SolrNet.Tests {
         public void GetRegisteredTypes() {
             var m = new AttributesMappingManager();
             var types = m.GetRegisteredTypes();
-            Assert.GreaterThan(types.Count, 0);
-            Assert.Contains(types, typeof(Entity));
-            Assert.Contains(types, typeof(InheritedEntity));
-            Assert.Contains(types, typeof(AnotherEntity));
-            Assert.DoesNotContain(types, typeof(NoProperties));
+            Assert.That(types.Count, Is.GreaterThan(0));
+			Assert.That(types, Contains.Item(typeof(Entity)));
+			Assert.That(types, Contains.Item(typeof(InheritedEntity)));
+			Assert.That(types, Contains.Item(typeof(AnotherEntity)));
+            Assert.That(types, !Contains.Item(typeof(NoProperties)));
         }
 
         public class NoProperties {}

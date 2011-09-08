@@ -1,4 +1,5 @@
-using MbUnit.Framework;
+using System;
+using NUnit.Framework;
 using SolrNet.Impl.FieldSerializers;
 using SolrNet.Impl.QuerySerializers;
 
@@ -8,14 +9,14 @@ namespace SolrNet.Tests
     public class SolrQueryByDistanceTests
     {
         [Test]
-        [ExpectedArgumentNullException]
-        public void NullField_should_throw()
+        [ExpectedException(typeof(ArgumentNullException))]
+		public void NullField_should_throw()
         {
             var q = new SolrQueryByDistance(null, 45.15, -93.85, 5);
         }
 
         [Test]
-        [ExpectedArgumentOutOfRangeException]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void NegativeDistance_should_throw()
         {
             var q = new SolrQueryByDistance("store", 45.15, -93.85, -100);

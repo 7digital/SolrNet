@@ -17,7 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet.Commands;
 

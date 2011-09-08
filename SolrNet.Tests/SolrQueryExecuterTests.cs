@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet.Attributes;
 using SolrNet.Commands.Parameters;
@@ -301,14 +301,15 @@ namespace SolrNet.Tests {
                     Reload = true,
                 },
             }).ToList();
-            Assert.Contains(p, KVP("spellcheck", "true"));
-            Assert.Contains(p, KVP("spellcheck.q", "hell"));
-            Assert.Contains(p, KVP("spellcheck.build", "true"));
-            Assert.Contains(p, KVP("spellcheck.collate", "true"));
-            Assert.Contains(p, KVP("spellcheck.count", "4"));
-            Assert.Contains(p, KVP("spellcheck.dictionary", "spanish"));
-            Assert.Contains(p, KVP("spellcheck.onlyMorePopular", "true"));
-            Assert.Contains(p, KVP("spellcheck.reload", "true"));
+
+			Assert.That(p, Contains.Item(KVP("spellcheck", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.q", "hell")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.build", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.collate", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.count", "4")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.dictionary", "spanish")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.onlyMorePopular", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.reload", "true")));
         }
 
         [Test]
@@ -336,20 +337,20 @@ namespace SolrNet.Tests {
                     UpperInclude = true
                 },
             }).ToList();
-            Assert.Contains(p, KVP("terms", "true"));
-            Assert.Contains(p, KVP("terms.fl", "text"));
-            Assert.Contains(p, KVP("terms.lower", "lower"));
-            Assert.Contains(p, KVP("terms.lower.incl", "true"));
-            Assert.Contains(p, KVP("terms.maxcount", "10"));
-            Assert.Contains(p, KVP("terms.mincount", "0"));
-            Assert.Contains(p, KVP("terms.prefix", "pre"));
-            Assert.Contains(p, KVP("terms.raw", "true"));
-            Assert.Contains(p, KVP("terms.regex", "regex"));
-            Assert.Contains(p, KVP("terms.regex.flag", RegexFlag.CanonEq.ToString()));
-            Assert.Contains(p, KVP("terms.regex.flag", RegexFlag.CaseInsensitive.ToString()));
-            Assert.Contains(p, KVP("terms.sort", "count"));
-            Assert.Contains(p, KVP("terms.upper", "upper"));
-            Assert.Contains(p, KVP("terms.upper.incl", "true"));
+			Assert.That(p, Contains.Item(KVP("terms", "true")));
+            Assert.That(p, Contains.Item(KVP("terms.fl", "text")));
+            Assert.That(p, Contains.Item(KVP("terms.lower", "lower")));
+            Assert.That(p, Contains.Item(KVP("terms.lower.incl", "true")));
+            Assert.That(p, Contains.Item(KVP("terms.maxcount", "10")));
+            Assert.That(p, Contains.Item(KVP("terms.mincount", "0")));
+            Assert.That(p, Contains.Item(KVP("terms.prefix", "pre")));
+            Assert.That(p, Contains.Item(KVP("terms.raw", "true")));
+            Assert.That(p, Contains.Item(KVP("terms.regex", "regex")));
+            Assert.That(p, Contains.Item(KVP("terms.regex.flag", RegexFlag.CanonEq.ToString())));
+            Assert.That(p, Contains.Item(KVP("terms.regex.flag", RegexFlag.CaseInsensitive.ToString())));
+            Assert.That(p, Contains.Item(KVP("terms.sort", "count")));
+            Assert.That(p, Contains.Item(KVP("terms.upper", "upper")));
+            Assert.That(p, Contains.Item(KVP("terms.upper.incl", "true")));
         }
 
         [Test]
@@ -370,14 +371,14 @@ namespace SolrNet.Tests {
                     Reload = true,
                 },
             }).ToList();
-            Assert.Contains(p, KVP("spellcheck", "true"));
-            Assert.Contains(p, KVP("spellcheck.q", "hell"));
-            Assert.Contains(p, KVP("spellcheck.build", "true"));
-            Assert.Contains(p, KVP("spellcheck.collate", "true"));
-            Assert.Contains(p, KVP("spellcheck.count", "4"));
-            Assert.Contains(p, KVP("spellcheck.dictionary", "spanish"));
-            Assert.Contains(p, KVP("spellcheck.onlyMorePopular", "true"));
-            Assert.Contains(p, KVP("spellcheck.reload", "true"));
+			Assert.That(p, Contains.Item(KVP("spellcheck", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.q", "hell")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.build", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.collate", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.count", "4")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.dictionary", "spanish")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.onlyMorePopular", "true")));
+            Assert.That(p, Contains.Item(KVP("spellcheck.reload", "true")));
         }
 
         [Test]
@@ -393,11 +394,11 @@ namespace SolrNet.Tests {
                     MinTermFreq = 1,
                 },
             }).ToList();
-            Assert.Contains(p, KVP("mlt", "true"));
-            Assert.Contains(p, KVP("mlt.mindf", "1"));
-            Assert.Contains(p, KVP("mlt.fl", "manu,cat"));
-            Assert.Contains(p, KVP("mlt.mintf", "1"));
-            Assert.Contains(p, KVP("q", "apache"));
+			Assert.That(p, Contains.Item(KVP("mlt", "true")));
+            Assert.That(p, Contains.Item(KVP("mlt.mindf", "1")));
+            Assert.That(p, Contains.Item(KVP("mlt.fl", "manu,cat")));
+            Assert.That(p, Contains.Item(KVP("mlt.mintf", "1")));
+            Assert.That(p, Contains.Item(KVP("q", "apache")));
         }
 
         [Test]
@@ -419,17 +420,17 @@ namespace SolrNet.Tests {
                     MinWordLength = 7,
                 }
             }).ToList();
-            Assert.Contains(p, KVP("mlt", "true"));
-            Assert.Contains(p, KVP("mlt.boost", "true"));
-            Assert.Contains(p, KVP("mlt.count", "10"));
-            Assert.Contains(p, KVP("mlt.maxqt", "2"));
-            Assert.Contains(p, KVP("mlt.maxntp", "3"));
-            Assert.Contains(p, KVP("mlt.maxwl", "4"));
-            Assert.Contains(p, KVP("mlt.mindf", "5"));
-            Assert.Contains(p, KVP("mlt.mintf", "6"));
-            Assert.Contains(p, KVP("mlt.minwl", "7"));
-            Assert.Contains(p, KVP("mlt.fl", "field1,field2"));
-            Assert.Contains(p, KVP("mlt.qf", "qf1,qf2"));
+			Assert.That(p, Contains.Item(KVP("mlt", "true")));
+            Assert.That(p, Contains.Item(KVP("mlt.boost", "true")));
+            Assert.That(p, Contains.Item(KVP("mlt.count", "10")));
+            Assert.That(p, Contains.Item(KVP("mlt.maxqt", "2")));
+            Assert.That(p, Contains.Item(KVP("mlt.maxntp", "3")));
+            Assert.That(p, Contains.Item(KVP("mlt.maxwl", "4")));
+            Assert.That(p, Contains.Item(KVP("mlt.mindf", "5")));
+            Assert.That(p, Contains.Item(KVP("mlt.mintf", "6")));
+            Assert.That(p, Contains.Item(KVP("mlt.minwl", "7")));
+            Assert.That(p, Contains.Item(KVP("mlt.fl", "field1,field2")));
+            Assert.That(p, Contains.Item(KVP("mlt.qf", "qf1,qf2")));
         }
 
         [Test]
@@ -544,17 +545,17 @@ namespace SolrNet.Tests {
                     NumDescriptions = 20
                 },
             }).ToList();
-            Assert.Contains(p, KVP("carrot.title", "headline"));
-            Assert.Contains(p, KVP("clustering.engine", "default"));
-            Assert.Contains(p, KVP("clustering.collection", "false"));
-            Assert.Contains(p, KVP("carrot.algorithm", "org.carrot2.clustering.lingo.LingoClusteringAlgorithm"));
-            Assert.Contains(p, KVP("carrot.url", "none"));
-            Assert.Contains(p, KVP("carrot.snippet", "synopsis"));
-            Assert.Contains(p, KVP("carrot.produceSummary", "true"));
-            Assert.Contains(p, KVP("carrot.fragSize", "10"));
-            Assert.Contains(p, KVP("carrot.numDescriptions", "20"));
-            Assert.Contains(p, KVP("carrot.outputSubClusters", "false"));
-            Assert.Contains(p, KVP("carrot.lexicalResourcesDir", "fakedir"));
+            Assert.That(p, Contains.Item(KVP("carrot.title", "headline")));
+            Assert.That(p, Contains.Item(KVP("clustering.engine", "default")));
+            Assert.That(p, Contains.Item(KVP("clustering.collection", "false")));
+			Assert.That(p, Contains.Item(KVP("carrot.algorithm", "org.carrot2.clustering.lingo.LingoClusteringAlgorithm")));
+            Assert.That(p, Contains.Item(KVP("carrot.url", "none")));
+            Assert.That(p, Contains.Item(KVP("carrot.snippet", "synopsis")));
+            Assert.That(p, Contains.Item(KVP("carrot.produceSummary", "true")));
+            Assert.That(p, Contains.Item(KVP("carrot.fragSize", "10")));
+            Assert.That(p, Contains.Item(KVP("carrot.numDescriptions", "20")));
+            Assert.That(p, Contains.Item(KVP("carrot.outputSubClusters", "false")));
+            Assert.That(p, Contains.Item(KVP("carrot.lexicalResourcesDir", "fakedir")));
         }
     }
 }

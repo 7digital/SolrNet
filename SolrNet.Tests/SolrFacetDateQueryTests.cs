@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Impl.FacetQuerySerializers;
 using SolrNet.Impl.FieldSerializers;
 using SolrNet.Impl.QuerySerializers;
@@ -32,12 +32,13 @@ namespace SolrNet.Tests {
                 Other = new[] {FacetDateOther.After},
             };
             var r = Serialize(q);
-            Assert.Contains(r, KV("facet.date", "timestamp"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.start", "2009-01-01T00:00:00Z"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.end", "2009-02-02T00:00:00Z"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.gap", "+1DAY"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.hardend", "true"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.other", "after"));
+			Assert.That(r, Contains.Item(KV("facet.date", "timestamp")));
+            Assert.That(r, Contains.Item(KV("facet.date", "timestamp")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.start", "2009-01-01T00:00:00Z")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.end", "2009-02-02T00:00:00Z")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.gap", "+1DAY")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.hardend", "true")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.other", "after")));
         }
         
         [Test]
@@ -47,12 +48,12 @@ namespace SolrNet.Tests {
                 Other = new[] { FacetDateOther.After },
             };
             var r = Serialize(q);
-            Assert.Contains(r, KV("facet.date", "{!ex=cat}timestamp"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.start", "2009-01-01T00:00:00Z"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.end", "2009-02-02T00:00:00Z"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.gap", "+1DAY"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.hardend", "true"));
-            Assert.Contains(r, KV("f.timestamp.facet.date.other", "after"));
+            Assert.That(r, Contains.Item(KV("facet.date", "{!ex=cat}timestamp")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.start", "2009-01-01T00:00:00Z")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.end", "2009-02-02T00:00:00Z")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.gap", "+1DAY")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.hardend", "true")));
+            Assert.That(r, Contains.Item(KV("f.timestamp.facet.date.other", "after")));
         }
 
         public KeyValuePair<K, V> KV<K, V>(K key, V value) {

@@ -24,7 +24,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Rhino.Mocks;
 using SolrNet.Attributes;
 using SolrNet.Impl;
@@ -477,7 +477,7 @@ namespace SolrNet.Tests {
 			Assert.AreEqual("features", kv.First().Key);
             Assert.AreEqual(1, kv.First().Value.Count);
             //Console.WriteLine(kv.First().Value.First());
-            Assert.Like(kv.First().Value.First(), "Noise");
+			Assert.That(kv.First().Value.First(), Is.StringMatching("Noise"));
 		}
 
         [Test]

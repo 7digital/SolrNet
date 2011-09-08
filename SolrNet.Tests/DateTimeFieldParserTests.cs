@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Impl.FieldParsers;
 using SolrNet.Impl.FieldSerializers;
 
@@ -26,8 +26,8 @@ namespace SolrNet.Tests {
     [TestFixture]
     public class DateTimeFieldParserTests {
         [Test]
-        [PairwiseJoin]
-        [Factory("DataFactory")]
+        [Pairwise]
+		[TestCaseSource("DataFactory")]
         public void ParseYears(string d, DateTime dt) {
             var p = new DateTimeFieldParser();
             Assert.AreEqual(dt, p.ParseDate(d));
@@ -39,7 +39,7 @@ namespace SolrNet.Tests {
         }
 
         [Test]
-        [Factory("DateTimes")]
+		[TestCaseSource("DateTimes")]
         public void RoundTrip(DateTime dt) {
             var parser = new DateTimeFieldParser();
             var serializer = new DateTimeFieldSerializer();
@@ -51,7 +51,7 @@ namespace SolrNet.Tests {
         }
 
         [Test]
-        [Factory("DateTimes")]
+		[TestCaseSource("DateTimes")]
         public void NullableRoundTrips(DateTime? dt) {
             var parser = new NullableFieldParser(new DateTimeFieldParser());
             var serializer = new NullableFieldSerializer(new DateTimeFieldSerializer());

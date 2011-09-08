@@ -15,7 +15,7 @@
 #endregion
 
 using System;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Exceptions;
 using SolrNet.Mapping;
 
@@ -81,7 +81,7 @@ namespace SolrNet.Tests {
         public void GetRegistered() {
             var m = new AllPropertiesMappingManager();
             var types = m.GetRegisteredTypes();
-            Assert.IsEmpty(types);
+            Assert.That(types, Is.Empty);
         }
 
         public class NoProperties {}

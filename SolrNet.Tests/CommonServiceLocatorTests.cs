@@ -18,7 +18,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Web;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Microsoft.Practices.ServiceLocation;
 using SolrNet.Utils;
 

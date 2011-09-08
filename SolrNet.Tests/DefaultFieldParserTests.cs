@@ -17,32 +17,32 @@
 using System;
 using System.Xml;
 using System.Xml.Linq;
-using MbUnit.Framework;
+using NUnit.Framework;
 using SolrNet.Impl.FieldParsers;
 
 namespace SolrNet.Tests {
     [TestFixture]
     public class DefaultFieldParserTests {
         [Test]
-        [Row("str")]
-        [Row("bool")]
-        [Row("int")]
-        [Row("date")]
+        [TestCase("str")]
+		[TestCase("bool")]
+		[TestCase("int")]
+		[TestCase("date")]
         public void CanHandleSolrTypes(string solrType) {
             var p = new DefaultFieldParser();
             Assert.IsTrue(p.CanHandleSolrType(solrType));
         }
 
         [Test]
-        [Row(typeof(float))]
-        [Row(typeof(float?))]
-        [Row(typeof(double))]
-        [Row(typeof(double?))]
-        [Row(typeof(string))]
-        [Row(typeof(DateTime))]
-        [Row(typeof(DateTime?))]
-        [Row(typeof(bool))]
-        [Row(typeof(bool?))]
+		[TestCase(typeof(float))]
+		[TestCase(typeof(float?))]
+		[TestCase(typeof(double))]
+		[TestCase(typeof(double?))]
+		[TestCase(typeof(string))]
+		[TestCase(typeof(DateTime))]
+		[TestCase(typeof(DateTime?))]
+		[TestCase(typeof(bool))]
+		[TestCase(typeof(bool?))]
         public void CanHandleType(Type t) {
             var p = new DefaultFieldParser();
             Assert.IsTrue(p.CanHandleType(t));

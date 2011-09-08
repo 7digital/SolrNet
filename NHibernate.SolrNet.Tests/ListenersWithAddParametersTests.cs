@@ -27,10 +27,9 @@ namespace NHibernate.SolrNet.Tests
         
         AddParameters addParameters = new AddParameters { CommitWithin = 4343 };
 
-        protected override SolrNetListener<Entity> GetSolrNetListener(ISolrOperations<Entity> solr)
-        {
-            return new SolrNetListener<Entity>(solr) {AddParameters = addParameters};
-        }
+		protected override SolrNetListener<Entity> GetSolrNetListener(ISolrOperations<Entity> solr) {
+			return new SolrNetListener<Entity>(solr) { AddParameters = addParameters };
+		}
 
         [Test]
         public void Add_includes_parameters_when_configured()
