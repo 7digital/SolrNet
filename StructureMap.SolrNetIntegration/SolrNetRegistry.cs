@@ -100,7 +100,8 @@ namespace StructureMap.SolrNetIntegration
         /// This method is meant to be used after the facility initialization
         /// </summary>
         /// <param name="core"></param>
-        private void RegisterCore(SolrCore core) {
+        private void RegisterCore(SolrCore core) 
+		{
             var coreConnectionId = core.Id + typeof(SolrConnection);
 
             For<ISolrConnection>().Add<SolrConnection>().Named(coreConnectionId).Ctor<string>("serverURL").Is(core.Url);
