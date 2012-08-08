@@ -71,10 +71,10 @@ namespace SolrNet.Impl.FieldParsers {
 
         public Array GetArrayProperty(XElement field, Type t) {
             // int[], string[], etc
-            var arr = (Array)Activator.CreateInstance(t, new object[] { field.Elements().Count() });
+            var arr = (Array)Activator.CreateInstance(t, new object[] { field.Elements().Count(x => x.Value != "") });
             var arrType = Type.GetType(t.ToString().Replace("[]", ""));
             int i = 0;
-            foreach (var arrayValueNode in field.Elements()) {
+			foreach (var arrayValueNode in field.Elements().Where(x => x.Value != "")){
                 arr.SetValue(valueParser.Parse(arrayValueNode, arrType), i);
                 i++;
             }
@@ -87,9 +87,11 @@ namespace SolrNet.Impl.FieldParsers {
             var gt = genericTypes[0];
             var l = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(gt));
             foreach (var arrayValueNode in field.Elements()) {
-                l.Add(valueParser.Parse(arrayValueNode, gt));
+            	object value = valueParser.Parse(arrayValueNode, gt);
+				if(value != null)
+            		l.Add(value);
             }
-            return l;
+        	return l;
         }
     }
 }

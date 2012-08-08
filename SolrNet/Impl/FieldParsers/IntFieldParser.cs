@@ -33,7 +33,13 @@ namespace SolrNet.Impl.FieldParsers {
         }
 
         public object Parse(XElement field, Type t) {
-            return int.Parse(field.Value, CultureInfo.InvariantCulture.NumberFormat);
+			try 
+			{
+				return int.Parse(field.Value, CultureInfo.InvariantCulture.NumberFormat);
+			}
+			catch (FormatException) {
+				return null;
+			}
         }
     }
 }

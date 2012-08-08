@@ -26,6 +26,9 @@
         <int>1</int>
         <int>2</int>
       </arr>
+      <arr name="emptyInt">
+        <int/>
+      </arr>
     </doc>
   </result>
 </response>

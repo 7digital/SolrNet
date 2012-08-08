@@ -129,6 +129,12 @@ namespace SolrNet.Tests {
             public IEnumerable<string> Features { get; set; }
         }
 
+		public class TestDocumentWithArraysContainingEmptyInt
+		{
+			[SolrField("emptyInt")]
+			public int[] EmptyInt { get; set; }
+		}
+
         public class TestDocumentWithDate  {
             [SolrField]
             public DateTime Fecha { get; set; }

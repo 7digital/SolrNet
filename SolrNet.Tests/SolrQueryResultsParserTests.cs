@@ -169,6 +169,19 @@ namespace SolrNet.Tests {
 		}
 
 		[Test]
+		[Description("It is possible to get back an empty int xml element from solr - not sure if this is a solr bug, but does need to be gracefully handled in SolrNet")]
+		public void SetPropertyWithArrayOfIntsToEmptyIntArrayIfEmptyInt()
+		{
+			var xml = EmbeddedResource.GetEmbeddedXml(GetType(), "Resources.responseWithArrays.xml");
+			var fieldNode = xml.XPathSelectElement("response/result/doc/arr[@name='emptyInt']");
+			var mapper = new AttributesMappingManager();
+			var visitor = new DefaultDocumentVisitor(mapper, new DefaultFieldParser());
+			var doc = new TestDocumentWithArraysContainingEmptyInt();
+			visitor.Visit(doc, "emptyInt", fieldNode);
+			Assert.AreEqual(0, doc.EmptyInt.Length);
+		}
+
+		[Test]
 		public void ParseResultsWithArrays() {
             var docParser = GetDocumentParser<TestDocumentWithArrays>();
             var innerParser = new ResultsResponseParser<TestDocumentWithArrays>(docParser);
