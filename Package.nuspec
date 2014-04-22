@@ -13,15 +13,15 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="SolrNet\bin\Release\SolrNet.dll" target="lib\net35" />
-    <file src="SolrNet\bin\Release\SolrNet.pdb" target="lib\net35" />
-    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.dll" target="lib\net35" />
-    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.pdb" target="lib\net35" />
-    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.dll" target="lib\net35" />
-    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.pdb" target="lib\net35" />
-    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.dll" target="lib\net35" />
-    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.pdb" target="lib\net35" />
-    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.dll" target="lib\net35" />
-    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.pdb" target="lib\net35" />
+    <file src="SolrNet\bin\Release\SolrNet.dll" target="lib\net40" />
+    <file src="SolrNet\bin\Release\SolrNet.pdb" target="lib\net40" />
+    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.dll" target="lib\net40" />
+    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.pdb" target="lib\net40" />
+    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.dll" target="lib\net40" />
+    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.pdb" target="lib\net40" />
+    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.dll" target="lib\net40" />
+    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.pdb" target="lib\net40" />
+    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.dll" target="lib\net40" />
+    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.pdb" target="lib\net40" />
   </files>
 </package>
