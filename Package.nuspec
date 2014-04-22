@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>SolrNet</id>
+    <version>1.0.0</version>
+    <authors>7digital</authors>
+    <owners>7digital</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>7digital's forked version of SolrNet.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <dependencies>      
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="SolrNet\bin\Release\SolrNet.dll" target="lib\net35" />
+    <file src="SolrNet\bin\Release\SolrNet.pdb" target="lib\net35" />
+    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.dll" target="lib\net35" />
+    <file src="SolrNet.DSL\bin\Release\SolrNet.DSL.pdb" target="lib\net35" />
+    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.dll" target="lib\net35" />
+    <file src="HttpWebAdapters\bin\Release\HttpWebAdapters.pdb" target="lib\net35" />
+    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.dll" target="lib\net35" />
+    <file src="Castle.Facilities.SolrNetIntegration\bin\Release\Castle.Facilities.SolrNetIntegration.pdb" target="lib\net35" />
+    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.dll" target="lib\net35" />
+    <file src="NHibernate.SolrNet\bin\Release\NHibernate.SolrNet.pdb" target="lib\net35" />
+  </files>
+</package>
